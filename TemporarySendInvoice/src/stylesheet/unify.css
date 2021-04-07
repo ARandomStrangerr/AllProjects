@@ -1,0 +1,17 @@
+.label{
+    -fx-font: normal 14 "Monaco";
+}
+.text-field{
+    -fx-font: normal 14 "Monaco";
+}
+.pane-padding{
+    -fx-padding:25;
+}
+.pane{
+    -fx-spacing:5;
+    -fx-alignment: center;
+    -fx-background-color: white;
+}
+.button{
+    -fx-font: normal 14 "Monaco";
+}
