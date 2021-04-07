@@ -1,0 +1,42 @@
+.pane{
+    -fx-padding: 25;
+    -fx-background-color: white;
+    -fx-spacing: 5;
+    -fx-alignment: center;
+}
+.menu-button{
+    -fx-background-color: transparent;
+    -fx-font: normal 16 "Courier New";
+}
+
+.button{
+    -fx-background-color: transparent;
+    -fx-font: normal 16 "Courier New";
+}
+
+.button: hover{
+    -fx-font-weight: bold;
+}
+
+.label{
+    -fx-font: normal 16 "Courier New";
+}
+
+.spacing{
+    -fx-spacing:5;
+}
+
+.grid-pane{
+    -fx-background-color: white;
+    -fx-padding: 25;
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+}
+
+.choice-box{
+    -fx-pref-width: 150;
+}
+
+.text-field{
+    -fx-font: normal 16 "Courier New";
+}
