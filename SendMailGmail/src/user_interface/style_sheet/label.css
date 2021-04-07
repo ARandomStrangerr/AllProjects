@@ -1,0 +1,9 @@
+.normal{
+    -fx-font-family: "Courier";
+}
+.title{
+    -fx-font-size: 20px;
+}
+.non-title{
+    -fx-font-size: 14px;
+}

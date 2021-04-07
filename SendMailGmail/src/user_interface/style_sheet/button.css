@@ -1,0 +1,13 @@
+.normal{
+    -fx-font-size: 14px;
+    -fx-font-family: "Courier";
+    -fx-background-radius: 1;
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
+}
+.normal:hover{
+    -fx-font-weight	: bold;
+}
+.normal: pressed{
+    -fx-font-weight	: bolder;
+}

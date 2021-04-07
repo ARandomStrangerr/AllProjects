@@ -1,0 +1,13 @@
+.normal{
+-fx-font-family: Courier;
+-fx-font-size: 14px;
+}
+.normal .column-header{
+-fx-pref-height: 40px
+}
+.normal .table-column{
+-fx-alignment: center-left;
+}
+.normal .table-row-cell{
+    -fx-cell-size: 40px
+}

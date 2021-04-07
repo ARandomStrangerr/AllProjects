@@ -1,0 +1,18 @@
+.leftMarginWrapper{
+    -fx-alignment: center-left;
+    -fx-spacing: 10;
+}
+.rightMarginWrapper{
+    -fx-alignment: center-right;
+    -fx-spacing: 10;
+}
+.centerMarginWrapper{
+    -fx-alignment: center;
+    -fx-spacing: 10;
+}
+.background{
+    -fx-background-color: #fafafa;
+    -fx-padding: 25;
+    -fx-spacing: 10;
+    -fx-pref-width: 900;
+}

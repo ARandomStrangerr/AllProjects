@@ -1,0 +1,18 @@
+.normal{
+    -fx-font-size: 14;
+    -fx-font-family: "Monaco";
+    -fx-background-color: white;
+    -fx-background-radius: 0;
+    -fx-border-color: #bfbfbf;
+}
+.normal: focused{
+    -fx-border-color: #1b43cd;
+}
+
+.attachmentFolderPath{
+    -fx-pref-width: 900;
+}
+
+.subject{
+    -fx-pref-width: 500;
+}
