@@ -2,7 +2,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import user_interface.MainMenu;
 
-public class Starter extends Application {
+public class SendMailGmail extends Application {
     /**
      * The main entry point for all JavaFX applications.
      * The start method is called after the init method has returned,
