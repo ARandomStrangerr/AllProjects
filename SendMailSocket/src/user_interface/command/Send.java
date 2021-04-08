@@ -39,26 +39,29 @@ public class Send implements CommandInterface {
                 password = "Hvnn2020",
                 address = "mail.vnua.edu.vn";
         int port = 25;
-//        Thread mailSendThread = new Thread(() -> {
-        try {
-            mailServer.openConnection(username, password, address, port);
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            return;
-        }
-        for (ReceiverInfo receiver : receiverInfo) {
+        Thread mailSendThread = new Thread(() -> {
             try {
-                mailServer.send(config.get("username"), receiver.getEmailAddress(), subject, body, folderPath + (char) 47 + receiver.getAttachmentFileName());
+                mailServer.openConnection(username, password, address, port);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+                return;
+            }
+            for (ReceiverInfo receiver : receiverInfo) {
+                try {
+                    mailServer.send(username, receiver.getEmailAddress(),
+                            subject,
+                            body,
+                            folderPath + (char) 92 + receiver.getAttachmentFileName());
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                mailServer.closeConnection();
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
-        }
-        try {
-            mailServer.closeConnection();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-//        });
+        });
 //        mailSendThread.setName("SEND MAIL THREAD");
 //        mailSendThread.start();
     }
