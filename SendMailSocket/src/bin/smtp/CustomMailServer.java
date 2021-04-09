@@ -46,7 +46,7 @@ public class CustomMailServer {
     public void send(String from, String to, String subject, String body, String attachmentPart) throws IOException, InterruptedException {
         writeToStream("MAIL FROM:<tckt@vnua.edu.vn>");
         Thread.sleep(1000);
-        writeToStream("RCPT TO:<billslim0996@gmail.com>");
+        writeToStream("RCPT TO:<" + to + ">");
         Thread.sleep(1000);
         writeToStream("DATA");
         Thread.sleep(1000);
