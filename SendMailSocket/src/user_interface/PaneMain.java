@@ -1,6 +1,8 @@
 package user_interface;
 
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -13,7 +15,7 @@ import user_interface.table_item.ReceiverInfo;
 
 public class PaneMain extends PaneAbstract {
 
-    public PaneMain(){
+    public PaneMain() {
         super(new VBox());
         setting();
     }
@@ -76,9 +78,18 @@ public class PaneMain extends PaneAbstract {
         serverSettingMenuItem.setOnAction(event -> super.execute(new ShowServerConfigPane(getOwnerWindow())));
         addSingleEntryMenuItem.setOnAction(event -> super.execute(new AddSingleEntryToTable(items)));
         addFromExcelMenuItem.setOnAction(event -> super.execute(new AddExcelFileToTable(items, getOwnerWindow().getOwnerStage())));
-        folderPickerButton.setOnAction(event -> super.execute(new SelectFolder(super.getOwnerWindow().getOwnerStage(),attachmentPathTextField)));
-        sendButton.setOnAction(event -> super.execute(new Send(table.getItems(),subjectTextFiled.getText(),bodyTextArea.getText(), attachmentPathTextField.getText())));
+        folderPickerButton.setOnAction(event -> super.execute(new SelectFolder(super.getOwnerWindow().getOwnerStage(), attachmentPathTextField)));
+        sendButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                String subject = subjectTextFiled.getText();
+                String body = bodyTextArea.getText();
+                String attachment = attachmentPathTextField.getText();
+                new Send(table.getItems(), subject, body, attachment).execute();
+            }
+        });
         //setup pane
         thisPane.getChildren().addAll(menuBar, wrapper1, table, attachmentPathFieldLabel, wrapper2, mailBodyLabel, wrapper3, bodyTextArea, wrapper4);
+        thisPane.setPrefHeight(500);
     }
 }
