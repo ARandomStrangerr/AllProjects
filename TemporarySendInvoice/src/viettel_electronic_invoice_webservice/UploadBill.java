@@ -109,7 +109,7 @@ public final class UploadBill implements Runnable {
                 Map<String, String> items = new LinkedHashMap<>();
                 String[] itemArr;
                 try {   //an exception is thrown when index out of bound
-                    itemArr = lineArr[i].split("-");
+                    itemArr = lineArr[i].split(";");
                     items.put("lineNumber", String.valueOf(index));
                     items.put("itemName", itemArr[0]);
                     items.put("unitPrice", itemArr[1]);
