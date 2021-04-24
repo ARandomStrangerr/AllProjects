@@ -88,6 +88,7 @@ public class PaneMain extends PaneAbstract {
                 new Send(table.getItems(), subject, body, attachment).execute();
             }
         });
+        deleteButton.setOnAction(event -> super.execute(new DeleteSelectedItem(table)));
         //setup pane
         thisPane.getChildren().addAll(menuBar, wrapper1, table, attachmentPathFieldLabel, wrapper2, mailBodyLabel, wrapper3, bodyTextArea, wrapper4);
         thisPane.setPrefHeight(500);

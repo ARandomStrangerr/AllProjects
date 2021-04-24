@@ -33,4 +33,11 @@ public class TextFile implements FileInterface {
         }
         bw.close();
     }
+
+    public void write(String path, String data) throws IOException {
+        BufferedWriter bw =  new BufferedWriter(new FileWriter(path));
+        bw.write(data);
+        bw.flush();
+        bw.close();
+    }
 }
