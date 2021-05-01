@@ -2,57 +2,56 @@ package bin.smtp;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.NoSuchElementException;
 
 public class CustomMailServer {
     private Socket mailSocket;
     private OutputStream os;
     private BufferedReader is;
     private String from, to;
-    private final List<ReceiverStructure> errorList;
-    int count = 0;
 
     public CustomMailServer() {
-        errorList = new LinkedList<>();
+
     }
 
-    public void send(String serverAddress,
-                     int port,
-                     String username,
-                     String password,
-                     String subject,
-                     String body,
-                     List<ReceiverStructure> receiverList) throws IOException, IllegalArgumentException {
-        if (!openConnection(serverAddress, port)) throw new SocketTimeoutException();  //establish connection
-        if (!login(username, password)) throw new IllegalArgumentException();   //login into the server
-        while (!receiverList.isEmpty()) {
-            ReceiverStructure currentPerson = receiverList.remove(0);
-            if (!setFrom(username)) throw new IllegalArgumentException();
-            if (!setTo(currentPerson.getEmail())){
-                closeConnection();
-                currentPerson.setError(ERROR.MAIL_DNE);
-                errorList.add(currentPerson);
-                break;
-            }
-            if (!setBody(subject,body,currentPerson.getFilePath())){
-                currentPerson.setError(ERROR.ATTACHMENT_DNE);
-                closeConnection();
-                break;
-            }
-            count++;
-        }
-        if (!receiverList.isEmpty()){
-            send(serverAddress, port, username, password,subject,body, receiverList);
-        }
+    /**
+     * send mail with given information
+     *
+     * @param address        address of the server
+     * @param port           port which the SMPT operates on
+     * @param username       login username (FROM)
+     * @param password       login password
+     * @param to             receiver (TO)
+     * @param subject        subject of the mail
+     * @param body           body of the mail
+     * @param attachmentPath path leads to attachment file
+     * @return true if the mail successfully sent
+     * <p>throws an error when the mail cannot be sent</p>
+     * @throws IOException              when the message cannot be send
+     * @throws IllegalArgumentException when the given name or password cannot be used to login
+     * @throws NoSuchElementException   when the receiver does not exists
+     * @throws FileNotFoundException    when the given file path does not lead to any file
+     * @throws SocketException          when the socket to the mail server cannot be established
+     */
+    public boolean send(String address,
+                        int port,
+                        String username,
+                        String password,
+                        String to,
+                        String subject,
+                        String body,
+                        String attachmentPath) throws IOException, IllegalArgumentException, NoSuchElementException {
+        if (!openConnection(address, port)) throw new SocketException();
+        if (!login(username, password)) throw new IllegalArgumentException();
+        if (!setFrom(username)) throw new IllegalArgumentException();
+        if (!setTo(to)) throw new NoSuchElementException();
+        if (!setBody(subject, body, attachmentPath)) throw new IOException();
         closeConnection();
-    }
-
-    public List<ReceiverStructure> getErrorList() {
-        return errorList;
+        return true;
     }
 
     /**
@@ -66,18 +65,21 @@ public class CustomMailServer {
      * <p>false if this client fail to establish connection to mail server .</p>
      * @throws IOException is thrown when fail to initiate Socket , InputStream , OutputStream , Write to stream or read from stream .
      */
-    public boolean openConnection(String address, int port) throws IOException {
-        mailSocket = new Socket(address, port); //create socket
-        mailSocket.setSoTimeout(2000);  //set timeout for reading
-        os = mailSocket.getOutputStream();  //create input stream
-        is = new BufferedReader(new InputStreamReader(mailSocket.getInputStream()));    //create output stream
-        //send data to server to initiate connection
-        writeToStream("EHLO " + address);
-        writeToStream("AUTH LOGIN");
+    private boolean openConnection(String address, int port) throws IOException {
         //try to read something back from server to verify the input stream is good
         for (int counter = 0; counter < 10; counter++) {
             try {
-                if (readFromStream("334 VXNlcm5hbWU6")) return true;   //this line might subject to change
+                mailSocket = new Socket(address, port); //create socket
+                mailSocket.setSoTimeout(3000);  //set timeout for reading
+                os = mailSocket.getOutputStream();  //create input stream
+                is = new BufferedReader(new InputStreamReader(mailSocket.getInputStream()));    //create output stream
+                //send data to server to initiate connection
+                writeToStream("EHLO " + address);
+                writeToStream("AUTH LOGIN");
+                for (String line = is.readLine(); line != null; line = is.readLine()) {
+                    System.out.println(line);
+                    if (line.equals("334 VXNlcm5hbWU6")) return true;   //this line might subject to change
+                }
             } catch (SocketTimeoutException e) {
                 System.err.println("timeout");  //signify the error just due to timeout (debugging purposed)
             }
@@ -157,19 +159,15 @@ public class CustomMailServer {
                 .append("\n");
         //create attachment part of the message if given
         if (attachmentPath != null) {
-            try {
-                String attachmentBody = encodeFileBase64(attachmentPath);
-                sb.append("--foo_bar_baz\n")
-                        .append("Content-Type: application/pdf\n")
-                        .append("MIME-Version: 1.0\n")
-                        .append("Content-Transfer-Encoding: base64\n")
-                        .append("Content-Disposition: attachment; filename=\"").append(attachmentPath).append("\"\n")
-                        .append("\n")
-                        .append(attachmentBody).append("\n")
-                        .append("\n");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            String attachmentBody = encodeFileBase64(attachmentPath);
+            sb.append("--foo_bar_baz\n")
+                    .append("Content-Type: application/pdf\n")
+                    .append("MIME-Version: 1.0\n")
+                    .append("Content-Transfer-Encoding: base64\n")
+                    .append("Content-Disposition: attachment; filename=\"").append(attachmentPath).append("\"\n")
+                    .append("\n")
+                    .append(attachmentBody).append("\n")
+                    .append("\n");
         }
         //end of the payload
         sb.append("--foo_bar_baz--");
@@ -183,6 +181,7 @@ public class CustomMailServer {
 
     private void closeConnection() throws IOException {
         writeToStream("QUIT");
+        readFromStream(null);
         os.close();
         is.close();
         mailSocket.close();
@@ -213,7 +212,7 @@ public class CustomMailServer {
     private void writeToStream(String data) throws IOException {
         os.write((data + "\r\n").getBytes());
         os.flush();
-        System.out.println("CLIENT : " + data);
+//        System.out.println("CLIENT : " + data);
     }
 
     /**

@@ -3,19 +3,26 @@ package user_interface.command;
 import bin.file.FileInterface;
 import bin.file.TextFile;
 import bin.smtp.CustomMailServer;
-import bin.smtp.ReceiverStructure;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import user_interface.ErrorPane;
 import user_interface.table_item.ReceiverInfo;
 
+import javax.sound.midi.Receiver;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.SocketException;
+import java.nio.file.NoSuchFileException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 public class Send implements CommandInterface {
     private final ObservableList<ReceiverInfo> receiverInfo;
@@ -49,13 +56,7 @@ public class Send implements CommandInterface {
             errorStage.show();
             return;
         }
-        //convert to data
-        LinkedList<ReceiverStructure> list = new LinkedList<>();
-        for (ReceiverInfo entry : receiverInfo) {
-            list.add(new ReceiverStructure(folderPath, entry.getAttachmentFileName(), entry.getEmailAddress()));
-        }
         //send the mails
-        CustomMailServer mailServer = new CustomMailServer();
         String username = "tckt@vnua.edu.vn",
                 password = "Hvnn2020",
                 address = "mail.vnua.edu.vn";
@@ -63,26 +64,51 @@ public class Send implements CommandInterface {
         Label displayMsg = new Label("Đang gởi");
         VBox vbox = new VBox(displayMsg);
         vbox.setPadding(new Insets(25, 25, 25, 25));
+        vbox.setPrefSize(250, 150);
+        vbox.setAlignment(Pos.CENTER);
         Stage messageStage = new Stage();
         messageStage.setScene(new Scene(vbox));
         messageStage.show();
         Thread mailSendThread = new Thread(() -> {
-            try {
-                mailServer.send(address, port, username, password, subject, body, list);
-            } catch (IOException e) {
-                e.printStackTrace();
+            CustomMailServer mail = new CustomMailServer();
+            ObservableList<ReceiverInfo> errorList = FXCollections.observableArrayList();
+            while (!receiverInfo.isEmpty()) {
+                ReceiverInfo receiver = receiverInfo.remove(0);
+                try {
+                    mail.send(address, port, username, password, receiver.getEmailAddress(), subject, body, folderPath + (char) 47 + receiver.getAttachmentFileName());
+                } catch (NoSuchElementException e) {
+                    System.err.println(receiver.getEmailAddress() + " MAIL DNE");
+                    receiver.setAttachmentFileName("Tài khoản email không tồn tại");
+                    errorList.add(receiver);
+                } catch (FileNotFoundException e) {
+                    System.err.println(receiver.getEmailAddress() + " FILE DNE");
+                    receiver.setAttachmentFileName("Tệp tin đính kèm không tồn tại");
+                    errorList.add(receiver);
+                } catch (IllegalArgumentException e) {
+                    System.err.println("CANNOT LOGIN");
+                    Platform.runLater(() -> displayMsg.setText("Lỗi:\nTên đăng nhập / mật khẩu không chính xác"));
+                    return;
+                } catch (SocketException e) {
+                    System.err.println("CANNOT ESTABLISH CONNECTION TO SERVER");
+                    Platform.runLater(() -> displayMsg.setText("Lỗi:\nKhông thể thiết lập kết nối"));
+                    return;
+                } catch (IOException e) {
+                    System.err.println(receiver.getEmailAddress() + " CANNOT SEND BODY");
+                    receiver.setAttachmentFileName("Server từ chối thư");
+                    errorList.add(receiver);
+                }
+                String displayStr = "Đang gởi\n(còn lại " + receiverInfo.size() + ")";
+                Platform.runLater(() -> displayMsg.setText(displayStr));
             }
-            StringBuilder sb = new StringBuilder();
-            for (ReceiverStructure item : mailServer.getErrorList()) {
-                if (sb.length() != 0) sb.append("\n");
-                sb.append(item.toString());
+            if (errorList.size() != 0){
+                ErrorPane errorPane = new ErrorPane();
+                errorPane.setTableItems(errorList);
+                Stage errorStage = new Stage();
+                errorStage.setScene(new Scene(errorPane.getPane()));
+                errorStage.show();
+            }else {
+                Platform.runLater(() -> displayMsg.setText("Hoàn Thành"));
             }
-            try {
-                TextFile.getInstance().write("log.txt", sb.toString());
-            } catch (IOException e) {
-
-            }
-            Platform.runLater(() -> displayMsg.setText("Hoàn Thành"));
         });
         mailSendThread.start();
     }
