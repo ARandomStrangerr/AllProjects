@@ -63,7 +63,6 @@ public final class UploadBill implements Runnable {
         //initiate constant data
         Map<String, String> generalInvoiceInfo = new LinkedHashMap<>(),
                 payment = new LinkedHashMap<>();
-
         generalInvoiceInfo.put("invoiceType", invoiceType);
         generalInvoiceInfo.put("templateCode", invoiceType + "0/" + templateCode);
         generalInvoiceInfo.put("currencyCode", "VND");
@@ -90,7 +89,6 @@ public final class UploadBill implements Runnable {
             try {   //an exception is thrown when index out of bound
                 buyerInfo.put("buyerName", lineArr[0]);
                 buyerInfo.put("buyerAddressLine", lineArr[1]);
-
                 summarizationInfo.put("sumOfTotalLineAmountWithoutTax", lineArr[2]);
                 summarizationInfo.put("totalAmountWithoutTax", lineArr[3]);
                 summarizationInfo.put("totalTaxAmount", lineArr[4]);
@@ -138,6 +136,7 @@ public final class UploadBill implements Runnable {
         //send and capture data feedback from server
         String feedback = null;
         for (String json : data) {
+            System.out.println(json);
             try {   //try to send data
                 //recording the feedback from server . if server return an error of missing field , this will be recorded without repeating itself .
                 //normally this is already eliminated from the previous step due to missing data while attempt to create json format

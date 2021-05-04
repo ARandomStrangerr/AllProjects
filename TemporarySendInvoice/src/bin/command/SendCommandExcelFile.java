@@ -2,9 +2,9 @@ package bin.command;
 
 import bin.error.NullInfoException;
 import javafx.stage.Stage;
-import user_interface.ErrorWindow;
 import user_interface.WaitWindow;
 import viettel_electronic_invoice_webservice.UploadBill;
+import viettel_electronic_invoice_webservice.UploadBillUpgrade;
 
 public final class SendCommandExcelFile implements Command {
     private final String sellerName,
@@ -62,6 +62,6 @@ public final class SendCommandExcelFile implements Command {
 //        }
         WaitWindow waitWindow = new WaitWindow(ownerStage);
         waitWindow.show();
-        UploadBill uploadBillThread = new UploadBill(username, password, excelFilePath, invoiceType, templateCode, waitWindow);
+        new UploadBillUpgrade(username, password, excelFilePath, invoiceType, templateCode, waitWindow);
     }
 }

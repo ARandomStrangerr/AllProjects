@@ -69,13 +69,20 @@ public class Send implements CommandInterface {
         Stage messageStage = new Stage();
         messageStage.setScene(new Scene(vbox));
         messageStage.show();
+        //prep stage
+        ObservableList<ReceiverInfo> errorList = FXCollections.observableArrayList();
+        ErrorPane errorPane = new ErrorPane();
+        errorPane.setTableItems(errorList);
+        Stage errorStage = new Stage();
+        errorStage.setScene(new Scene(errorPane.getPane()));
+        //thread
         Thread mailSendThread = new Thread(() -> {
             CustomMailServer mail = new CustomMailServer();
-            ObservableList<ReceiverInfo> errorList = FXCollections.observableArrayList();
             while (!receiverInfo.isEmpty()) {
                 ReceiverInfo receiver = receiverInfo.remove(0);
+                String path = folderPath == null || receiver.getAttachmentFileName() == null ? null : folderPath + (char) 47 + receiver.getAttachmentFileName();
                 try {
-                    mail.send(address, port, username, password, receiver.getEmailAddress(), subject, body, folderPath + (char) 47 + receiver.getAttachmentFileName());
+                    mail.send(address, port, username, password, receiver.getEmailAddress(), subject, body, path);
                 } catch (NoSuchElementException e) {
                     System.err.println(receiver.getEmailAddress() + " MAIL DNE");
                     receiver.setAttachmentFileName("Tài khoản email không tồn tại");
@@ -100,13 +107,9 @@ public class Send implements CommandInterface {
                 String displayStr = "Đang gởi\n(còn lại " + receiverInfo.size() + ")";
                 Platform.runLater(() -> displayMsg.setText(displayStr));
             }
-            if (errorList.size() != 0){
-                ErrorPane errorPane = new ErrorPane();
-                errorPane.setTableItems(errorList);
-                Stage errorStage = new Stage();
-                errorStage.setScene(new Scene(errorPane.getPane()));
-                errorStage.show();
-            }else {
+            if (errorList.size() != 0) {
+                Platform.runLater(errorStage::show);
+            } else {
                 Platform.runLater(() -> displayMsg.setText("Hoàn Thành"));
             }
         });
