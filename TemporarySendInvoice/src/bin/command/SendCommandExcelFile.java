@@ -30,36 +30,31 @@ public final class SendCommandExcelFile implements Command {
                                 String password,
                                 String exchangeUser,
                                 Stage ownerStage) {
-        if (sellerName.isBlank()) throw new NullInfoException("Tên đơn vị bán", ownerStage);
+        if (sellerName.isEmpty()) throw new NullInfoException("Tên đơn vị bán", ownerStage);
         this.sellerName = sellerName;
-        if (sellerAddress.isBlank()) throw new NullInfoException("Địa chỉ", ownerStage);
+        if (sellerAddress.isEmpty()) throw new NullInfoException("Địa chỉ", ownerStage);
         this.sellerAddress = sellerAddress;
-        if (invoiceSeries.isBlank()) throw new NullInfoException("Kí hiệu", ownerStage);
+        if (invoiceSeries.isEmpty()) throw new NullInfoException("Kí hiệu", ownerStage);
         this.invoiceSeries = invoiceSeries;
-        if (invoiceType.isBlank()) throw new NullInfoException("Loại hóa đơn", ownerStage);
+        if (invoiceType.isEmpty()) throw new NullInfoException("Loại hóa đơn", ownerStage);
         this.invoiceType = invoiceType;
-        if (templateCode.isBlank()) throw new NullInfoException("Kí hiệu mẫu hóa đơn", ownerStage);
+        if (templateCode.isEmpty()) throw new NullInfoException("Kí hiệu mẫu hóa đơn", ownerStage);
         this.templateCode = templateCode;
-        if (excelFilePath.isBlank()) throw new NullInfoException("Đường dẫn tệp tin excel", ownerStage);
+        if (excelFilePath.isEmpty()) throw new NullInfoException("Đường dẫn tệp tin excel", ownerStage);
         this.excelFilePath = excelFilePath;
-        if (folderPath.isBlank()) throw new NullInfoException("Đường dẫn thư mục chứa hóa đơn", ownerStage);
+        if (folderPath.isEmpty()) throw new NullInfoException("Đường dẫn thư mục chứa hóa đơn", ownerStage);
         this.folderPath = folderPath;
-        if (username.isBlank()) throw new NullInfoException("Tên đăng nhập", ownerStage);
+        if (username.isEmpty()) throw new NullInfoException("Tên đăng nhập", ownerStage);
         this.username = username;
-        if (password.isBlank()) throw new NullInfoException("Mật khẩu", ownerStage);
+        if (password.isEmpty()) throw new NullInfoException("Mật khẩu", ownerStage);
         this.password = password;
-        if (exchangeUser.isBlank()) throw new NullInfoException("Tên người dùng", ownerStage);
+        if (exchangeUser.isEmpty()) throw new NullInfoException("Tên người dùng", ownerStage);
         this.exchangeUser = exchangeUser;
         this.ownerStage = ownerStage;
     }
 
     @Override
     public void execute() {
-//        String TAX_CODE_CONSTANT = "";
-//        if (!username.equals(TAX_CODE_CONSTANT)){
-//            new ErrorWindow(ownerStage," :) ");
-//            return;
-//        }
         WaitWindow waitWindow = new WaitWindow(ownerStage);
         waitWindow.show();
         new UploadBillUpgrade(username, password, excelFilePath, invoiceType, templateCode, waitWindow);

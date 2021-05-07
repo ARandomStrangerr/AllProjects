@@ -69,46 +69,48 @@ public class Send implements CommandInterface {
         Stage messageStage = new Stage();
         messageStage.setScene(new Scene(vbox));
         messageStage.show();
-        //prep stage
-        ObservableList<ReceiverInfo> errorList = FXCollections.observableArrayList();
-        ErrorPane errorPane = new ErrorPane();
-        errorPane.setTableItems(errorList);
-        Stage errorStage = new Stage();
-        errorStage.setScene(new Scene(errorPane.getPane()));
         //thread
         Thread mailSendThread = new Thread(() -> {
+            ObservableList<ReceiverInfo> errorList = FXCollections.observableArrayList();
             CustomMailServer mail = new CustomMailServer();
             while (!receiverInfo.isEmpty()) {
                 ReceiverInfo receiver = receiverInfo.remove(0);
-                String path = folderPath == null || receiver.getAttachmentFileName() == null ? null : folderPath + (char) 47 + receiver.getAttachmentFileName();
-                try {
-                    mail.send(address, port, username, password, receiver.getEmailAddress(), subject, body, path);
-                } catch (NoSuchElementException e) {
-                    System.err.println(receiver.getEmailAddress() + " MAIL DNE");
-                    receiver.setAttachmentFileName("Tài khoản email không tồn tại");
-                    errorList.add(receiver);
-                } catch (FileNotFoundException e) {
-                    System.err.println(receiver.getEmailAddress() + " FILE DNE");
-                    receiver.setAttachmentFileName("Tệp tin đính kèm không tồn tại");
-                    errorList.add(receiver);
-                } catch (IllegalArgumentException e) {
-                    System.err.println("CANNOT LOGIN");
-                    Platform.runLater(() -> displayMsg.setText("Lỗi:\nTên đăng nhập / mật khẩu không chính xác"));
-                    return;
-                } catch (SocketException e) {
-                    System.err.println("CANNOT ESTABLISH CONNECTION TO SERVER");
-                    Platform.runLater(() -> displayMsg.setText("Lỗi:\nKhông thể thiết lập kết nối"));
-                    return;
-                } catch (IOException e) {
-                    System.err.println(receiver.getEmailAddress() + " CANNOT SEND BODY");
-                    receiver.setAttachmentFileName("Server từ chối thư");
-                    errorList.add(receiver);
-                }
+                String path = folderPath == null || receiver.getAttachmentFileName() == null ? null : folderPath + (char) 92 + receiver.getAttachmentFileName();
+//                try {
+//                    mail.send(address, port, username, password, receiver.getEmailAddress(), subject, body, path);
+//                } catch (NoSuchElementException e) {
+//                    System.err.println(receiver.getEmailAddress() + " MAIL DNE");
+//                    receiver.setAttachmentFileName("Tài khoản email không tồn tại");
+//                    errorList.add(receiver);
+//                } catch (FileNotFoundException e) {
+//                    System.err.println(receiver.getEmailAddress() + " FILE DNE");
+//                    receiver.setAttachmentFileName("Tệp tin đính kèm không tồn tại");
+//                    errorList.add(receiver);
+//                } catch (IllegalArgumentException e) {
+//                    System.err.println("CANNOT LOGIN");
+//                    Platform.runLater(() -> displayMsg.setText("Lỗi:\nTên đăng nhập / mật khẩu không chính xác"));
+//                    return;
+//                } catch (SocketException e) {
+//                    System.err.println("CANNOT ESTABLISH CONNECTION TO SERVER");
+//                    Platform.runLater(() -> displayMsg.setText("Lỗi:\nKhông thể thiết lập kết nối"));
+//                    return;
+//                } catch (IOException e) {
+//                    System.err.println(receiver.getEmailAddress() + " CANNOT SEND BODY");
+//                    receiver.setAttachmentFileName("Server từ chối thư");
+//                    errorList.add(receiver);
+//                }
+                System.out.println(path);
                 String displayStr = "Đang gởi\n(còn lại " + receiverInfo.size() + ")";
                 Platform.runLater(() -> displayMsg.setText(displayStr));
             }
             if (errorList.size() != 0) {
-                Platform.runLater(errorStage::show);
+                Platform.runLater(() -> {
+                    ErrorPane errorPane = new ErrorPane();
+                    errorPane.setTableItems(errorList);
+                    Stage errorStage = new Stage();
+                    errorStage.setScene(new Scene(errorPane.getPane()));
+                    errorStage.show();
+                });
             } else {
                 Platform.runLater(() -> displayMsg.setText("Hoàn Thành"));
             }
