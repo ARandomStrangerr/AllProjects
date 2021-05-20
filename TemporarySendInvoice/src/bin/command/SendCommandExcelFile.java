@@ -3,7 +3,7 @@ package bin.command;
 import bin.error.NullInfoException;
 import javafx.stage.Stage;
 import user_interface.WaitWindow;
-import viettel_electronic_invoice_webservice.UploadBill;
+import viettel_electronic_invoice_webservice.UploadBillNewAPI;
 import viettel_electronic_invoice_webservice.UploadBillUpgrade;
 
 public final class SendCommandExcelFile implements Command {
@@ -55,8 +55,11 @@ public final class SendCommandExcelFile implements Command {
 
     @Override
     public void execute() {
-        WaitWindow waitWindow = new WaitWindow(ownerStage);
-        waitWindow.show();
-        new UploadBillUpgrade(username, password, excelFilePath, invoiceType, templateCode, waitWindow);
+//        WaitWindow waitWindow = new WaitWindow(ownerStage);
+//        waitWindow.show();
+//        new UploadBillUpgrade(username, password, excelFilePath, invoiceType, templateCode, waitWindow);
+        Runnable upload = new UploadBillNewAPI(username, password, excelFilePath, invoiceType, invoiceSeries, templateCode);
+        Thread thread = new Thread(upload);
+        thread.run();
     }
 }

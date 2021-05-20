@@ -1,5 +1,5 @@
 package user_interface.command;
 
-public interface Command {
+public user_interface Command {
     void execute();
 }

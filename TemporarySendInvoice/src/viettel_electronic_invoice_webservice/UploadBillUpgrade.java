@@ -15,18 +15,25 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class UploadBillUpgrade implements Runnable {
-    private final String username, password, excelFilePath, invoiceType, templateCode;
+    private final String username, password, excelFilePath, invoiceType, templateCode, invoiceSeries;
     private final LinkedList<String> sentListData = new LinkedList<>(),
             sendRecord = new LinkedList<>(),
             missingField = new LinkedList<>();
     private final WaitWindow waitWindow;
 
-    public UploadBillUpgrade(String username, String password, String excelFilePath, String invoiceType, String templateCode, WaitWindow waitWindow) {
+    public UploadBillUpgrade(String username,
+                             String password,
+                             String excelFilePath,
+                             String invoiceType,
+                             String templateCode,
+                             String invoiceSeries,
+                             WaitWindow waitWindow) {
         this.username = username;
         this.password = password;
         this.excelFilePath = excelFilePath;
         this.invoiceType = invoiceType;
         this.templateCode = templateCode;
+        this.invoiceSeries = invoiceSeries;
         this.waitWindow = waitWindow;
         new Thread(this).start();
     }
@@ -74,7 +81,7 @@ public class UploadBillUpgrade implements Runnable {
             //capture the invoice number
             int begin = feedback.indexOf("invoiceNo") + 12, end = begin + 13;
             sentListData.add(feedback.substring(begin, end));
-            TextFile.getInstance().append("log.txt",root.getData());
+            TextFile.getInstance().append("log.txt", root.getData());
         }
         //step 4 : write log to file
         writeDataToFiles();
@@ -86,12 +93,13 @@ public class UploadBillUpgrade implements Runnable {
         //generalInvoiceInfo
         NodeSingleValue invoiceType = new NodeSingleValue("invoiceType", this.invoiceType), //declaration of values
                 templateCode = new NodeSingleValue("templateCode", this.invoiceType + "0/" + this.templateCode),
+                invoiceSeries = new NodeSingleValue("invoiceSeries", this.invoiceSeries),
                 currencyCode = new NodeSingleValue("currencyCode", "VND"),
                 adjustmentType = new NodeSingleValue("adjustmentType", 1),
                 paymentStatus = new NodeSingleValue("paymentStatus", true),
                 cusGetInvoiceRight = new NodeSingleValue("cusGetInvoiceRight", true);
         NodeNamedCurlyBrace generalInvoiceInfo = new NodeNamedCurlyBrace("generalInvoiceInfo");     //declaration of super field
-        generalInvoiceInfo.addAll(invoiceType, templateCode, currencyCode, adjustmentType, paymentStatus, cusGetInvoiceRight);  //add elements nodes into super field
+        generalInvoiceInfo.addAll(invoiceType, templateCode, invoiceSeries, currencyCode, adjustmentType, paymentStatus, cusGetInvoiceRight);  //add elements nodes into super field
         //buyerInfo
         NodeSingleValue buyerName = new NodeSingleValue("buyerName", cells[0]),
                 buyerAddress = new NodeSingleValue("buyerAddressLine", cells[1]);

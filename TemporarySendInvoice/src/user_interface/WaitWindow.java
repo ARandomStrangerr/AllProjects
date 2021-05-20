@@ -7,16 +7,20 @@ import javafx.stage.Stage;
 
 public final class WaitWindow extends SuperWindow {
 
+    private final Label label = new Label("Vui lòng đợi");
     public WaitWindow(Stage ownerStage) {
         super(ownerStage, "Đợi");
     }
 
     @Override
     protected Pane pane() {
-        Label label = new Label("Vui lòng đợi");
         HBox primePane = new HBox(label);
         primePane.getStylesheets().add("stylesheet/unify.css");
         primePane.getStyleClass().addAll("pane-padding", "pane");
         return primePane;
+    }
+
+    public void setDisplayMessage(String msg) {
+        label.setText(msg);
     }
 }

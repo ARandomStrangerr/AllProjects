@@ -33,6 +33,19 @@ public final class ExcelFile implements FileOperation {
         return data;
     }
 
+    public List<List<String>> readList(String path) throws IOException{
+        Workbook workbook = WorkbookFactory.create(new File(path));
+        Sheet sheet = workbook.getSheetAt(0);
+        DataFormatter dataFormatter = new DataFormatter();
+        List<List<String>> rows = new LinkedList<>();
+        for(Row row : sheet) {
+            List<String> cells = new LinkedList<>();
+            for(Cell cell : row) cells.add(dataFormatter.formatCellValue(cell));
+            rows.add(cells);
+        }
+        return rows;
+    }
+
     @Override
     public void writeNew(String path, String data) {
 
