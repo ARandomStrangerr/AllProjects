@@ -21,7 +21,7 @@ public final class OpenMessageWindow implements CommandInterface {
         upperMessage.setDisplayMessageLabel(displayMsg);
         PaneMessageConcrete paneMessageConcrete = PaneMessageConcrete.getInstance();
         paneMessageConcrete.setUpperPane(upperMessage);
-        if (paneMessageConcrete.getWindow() == null){
+        if (paneMessageConcrete.getWindow() == null) {
             WindowPopup popupWindow = new WindowPopup();
             popupWindow.setPane(paneMessageConcrete);
             popupWindow.setOwnerStage(ownerWindow.getCurrentStage());

@@ -57,7 +57,9 @@ public class ConnectionNew {
         String data = sendData(nodeRoot.getData(), Address.ADDRESS, Action.TOKEN, null, Method.POST);
         JsonAnalyzer analyzer = new JsonAnalyzer();
         NodeCurlyBrace root = (NodeCurlyBrace) analyzer.getRoot(data);
-        requestProperties.put("Cookie", root.get("access_token").getData());
+        NodeSingleValue accessToken = (NodeSingleValue) root.get("access_token");
+        requestProperties.put("Cookie", accessToken.getName() + "=" + accessToken.getValue());
+        System.out.println(accessToken.getValue());
     }
 
     public String send(String data, String taxCode) throws IOException {
@@ -71,13 +73,19 @@ public class ConnectionNew {
         con.setDoOutput(true);
         con.setUseCaches(false);
         for (Map.Entry<String, String> entry : requestProperties.entrySet())
-            con.addRequestProperty(entry.getKey(), entry.getValue());
+            con.setRequestProperty(entry.getKey(), entry.getValue());
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
         bw.write(data);
         bw.newLine();
         bw.flush();
-        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        BufferedReader br;
+        try {
+            br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        } catch (IOException e) {
+            br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+        }
         String line = br.readLine();
+        System.out.println(line);
         br.close();
         bw.close();
         con.disconnect();

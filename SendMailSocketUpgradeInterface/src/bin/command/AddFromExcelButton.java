@@ -18,9 +18,9 @@ public final class AddFromExcelButton implements CommandInterface {
     public void execute() {
         FileChooser fileChooser = new FileChooser();
         String path;
-        try{
+        try {
             path = fileChooser.showOpenDialog(PaneMain.getInstance().getWindow().getCurrentStage()).getAbsolutePath();
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             System.err.println("FILE HAS NOT BEEN PICKED");
             return;
         }

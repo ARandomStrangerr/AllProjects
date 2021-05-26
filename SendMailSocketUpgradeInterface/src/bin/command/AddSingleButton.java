@@ -12,7 +12,7 @@ public final class AddSingleButton implements CommandInterface {
     }
 
     @Override
-    public void execute(){
+    public void execute() {
         items.add(new ReceiverInfo("Trống", "Trống"));
     }
 }

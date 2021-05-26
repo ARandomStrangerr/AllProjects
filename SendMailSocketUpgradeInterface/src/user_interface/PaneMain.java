@@ -4,6 +4,7 @@ import bin.command.*;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -57,11 +58,13 @@ public final class PaneMain extends PaneAbstract {
         //table
         TableColumn<ReceiverInfo, String> emailColumn = new TableColumn<>("Địa chỉ nhận"),
                 attachmentColumn = new TableColumn<>("Tệp đính kèm");
+        tableView.setEditable(true);
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        emailColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         emailColumn.setOnEditCommit(event -> tableView.getSelectionModel().getSelectedItem().setEmail(event.getNewValue()));
         attachmentColumn.setCellValueFactory(new PropertyValueFactory<>("variableField"));
+        attachmentColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         attachmentColumn.setOnEditCommit(event -> tableView.getSelectionModel().getSelectedItem().setVariableField(event.getNewValue()));
-        tableView.setEditable(true);
         tableView.getColumns().add(emailColumn);
         tableView.getColumns().add(attachmentColumn);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

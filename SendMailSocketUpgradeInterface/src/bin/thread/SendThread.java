@@ -1,5 +1,6 @@
 package bin.thread;
 
+import bin.command.OpenLeftOverMailWindow;
 import bin.command.OpenMessageWindow;
 import bin.command.OpenUncloseableMessageWindow;
 import bin.file.TextFile;
@@ -39,6 +40,7 @@ public class SendThread implements Runnable {
         }
         if (items.isEmpty()) {
             Platform.runLater(() -> new OpenMessageWindow("Danh sách người nhận trống", PaneMain.getInstance().getWindow()).execute());
+            return;
         }
         try {
             for (String line : textFile.read("config.txt")) {
@@ -62,7 +64,7 @@ public class SendThread implements Runnable {
             System.err.println("Missing");
             return;
         }
-        new OpenUncloseableMessageWindow("Đang gởi", paneMain.getWindow()).execute();
+        Platform.runLater(() -> new OpenUncloseableMessageWindow("Đang gởi", paneMain.getWindow()).execute());
         while (!items.isEmpty()) {
             ReceiverInfo currentItem = items.remove(0);
             String attachmentFilePath = attachmentFolder.isEmpty() || currentItem.getVariableField().isEmpty() ? null : attachmentFolder + (char) 92 + currentItem.getVariableField();
@@ -103,6 +105,12 @@ public class SendThread implements Runnable {
             }
             String displayMsg = "còn lại " + items.size();
             Platform.runLater(() -> PaneUpperMessage.getInstance().setDisplayMessageLabel(displayMsg));
+        }
+        Platform.runLater(() -> PaneUpperMessage.getInstance().getWindow().closeCurrentStage());
+        if (unsentItems.size() > 0) {
+            Platform.runLater(() -> new OpenLeftOverMailWindow(unsentItems, paneMain.getWindow()).execute());
+        } else {
+            Platform.runLater(() -> new OpenMessageWindow("Hoàn Thành", paneMain.getWindow()));
         }
     }
 }
