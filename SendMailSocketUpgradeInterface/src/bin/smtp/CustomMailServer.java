@@ -71,8 +71,8 @@ public class CustomMailServer {
             try {
                 mailSocket = new Socket(address, port); //create socket
                 mailSocket.setSoTimeout(3000);  //set timeout for reading
-                os = mailSocket.getOutputStream();  //create input stream
-                is = new BufferedReader(new InputStreamReader(mailSocket.getInputStream()));    //create output stream
+                os = mailSocket.getOutputStream();  //create output stream
+                is = new BufferedReader(new InputStreamReader(mailSocket.getInputStream()));    //create input stream
                 //send data to server to initiate connection
                 writeToStream("EHLO " + address);
                 writeToStream("AUTH LOGIN");

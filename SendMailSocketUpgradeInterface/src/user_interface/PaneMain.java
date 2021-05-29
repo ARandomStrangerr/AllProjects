@@ -11,6 +11,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import user_interface.table_item.ReceiverInfo;
 
+import java.util.List;
+
 public final class PaneMain extends PaneAbstract {
     //static components
     private static PaneMain cache;
@@ -132,5 +134,9 @@ public final class PaneMain extends PaneAbstract {
 
     public ObservableList<ReceiverInfo> getItems() {
         return tableView.getItems();
+    }
+
+    public void setItems(ObservableList<ReceiverInfo> receiverInfos){
+        tableView.setItems(receiverInfos);
     }
 }

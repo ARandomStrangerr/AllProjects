@@ -1,18 +1,18 @@
 package bin.thread;
 
-import bin.command.OpenLeftOverMailWindow;
 import bin.command.OpenMessageWindow;
 import bin.command.OpenUncloseableMessageWindow;
 import bin.file.TextFile;
-import bin.smtp.CustomMailServer;
+import bin.smtp.Office365Server;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import user_interface.PaneMain;
-import user_interface.PaneUpperMessage;
+import user_interface.PaneOnlyMessage;
 import user_interface.table_item.ReceiverInfo;
 
-import java.io.FileNotFoundException;
+import javax.mail.MessagingException;
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.*;
 
 public class SendThread implements Runnable {
@@ -26,9 +26,8 @@ public class SendThread implements Runnable {
         String messageBody = paneMain.getMessageBody(),
                 messageSubject = paneMain.getMessageSubject(),
                 attachmentFolder = paneMain.getAttachmentFolder();
-        List<ReceiverInfo> items = paneMain.getItems(),
-                unsentItems = new LinkedList<>();
-        CustomMailServer customMailServer = new CustomMailServer();
+        List<ReceiverInfo> items = paneMain.getItems();
+        ObservableList<ReceiverInfo> unsentItems = FXCollections.observableArrayList();
         Map<String, String> map = new LinkedHashMap<>();
         TextFile textFile = TextFile.getInstance();
         if (messageBody.isBlank()) {
@@ -64,53 +63,30 @@ public class SendThread implements Runnable {
             System.err.println("Missing");
             return;
         }
-        Platform.runLater(() -> new OpenUncloseableMessageWindow("Đang gởi", paneMain.getWindow()).execute());
+        Office365Server server = new Office365Server(map.get("serverAddress"),
+                Integer.parseInt(map.get("serverPort")),
+                map.get("username"),
+                map.get("password"));
+        Platform.runLater(() -> new OpenUncloseableMessageWindow("Vui lòng đợi", paneMain.getWindow()).execute());
         while (!items.isEmpty()) {
             ReceiverInfo currentItem = items.remove(0);
-            String attachmentFilePath = attachmentFolder.isEmpty() || currentItem.getVariableField().isEmpty() ? null : attachmentFolder + (char) 92 + currentItem.getVariableField();
+            String attachmentFilePath = attachmentFolder.isEmpty() || currentItem.getVariableField().isEmpty() ? null : attachmentFolder + (char) 47 + currentItem.getVariableField();
             try {
-                customMailServer.send(map.get("serverAddress"),
-                        Integer.parseInt(map.get("serverPort")),
-                        map.get("username"),
-                        map.get("password"), currentItem.getEmail(),
-                        messageSubject,
-                        messageBody,
-                        attachmentFilePath);
-            } catch (NoSuchElementException e) {
-                System.err.println(currentItem.getEmail() + " MAIL DNE");
-                currentItem.setVariableField("Tài khoản email không tồn tại");
-                unsentItems.add(currentItem);
-            } catch (FileNotFoundException e) {
-                System.err.println(currentItem.getEmail() + " FILE DNE");
-                currentItem.setVariableField("Tệp tin đính kèm không tồn tại");
-                unsentItems.add(currentItem);
-            } catch (IllegalArgumentException e) {
-                System.err.println("CANNOT LOGIN");
-                Platform.runLater(() -> {
-                    PaneUpperMessage.getInstance().getWindow().closeCurrentStage();
-                    new OpenMessageWindow("Sai tên đăng nhập / mật khẩu", paneMain.getWindow()).execute();
-                });
-                return;
-            } catch (SocketException e) {
-                System.err.println("CANNOT ESTABLISH CONNECTION TO SERVER");
-                Platform.runLater(() -> {
-                    PaneUpperMessage.getInstance().getWindow().closeCurrentStage();
-                    new OpenMessageWindow("Không thể thiết lập kết nối đến server", paneMain.getWindow()).execute();
-                });
-                return;
-            } catch (IOException e) {
-                System.err.println(currentItem.getEmail() + " CANNOT SEND BODY");
-                currentItem.setVariableField("Server từ chối thư");
+                server.newMsg();
+                server.setSender(map.get("username"));
+                server.setReceiver(currentItem.getEmail());
+                server.setSubject(messageSubject);
+                server.setBody(messageBody);
+                if (attachmentFilePath != null) server.setAttachment(attachmentFilePath);
+                server.send();
+            } catch (MessagingException | IOException e) {
                 unsentItems.add(currentItem);
             }
-            String displayMsg = "còn lại " + items.size();
-            Platform.runLater(() -> PaneUpperMessage.getInstance().setDisplayMessageLabel(displayMsg));
+            String displayMsg = "Còn " + items.size();
+            Platform.runLater(() -> PaneOnlyMessage.getInstance().setDisplayMessageLabel(displayMsg));
         }
-        Platform.runLater(() -> PaneUpperMessage.getInstance().getWindow().closeCurrentStage());
-        if (unsentItems.size() > 0) {
-            Platform.runLater(() -> new OpenLeftOverMailWindow(unsentItems, paneMain.getWindow()).execute());
-        } else {
-            Platform.runLater(() -> new OpenMessageWindow("Hoàn Thành", paneMain.getWindow()));
-        }
+        Platform.runLater(() -> PaneOnlyMessage.getInstance().getWindow().closeCurrentStage());
+        Platform.runLater(() -> new OpenMessageWindow("Hoàn Thành", paneMain.getWindow()).execute());
+        paneMain.setItems(unsentItems);
     }
 }
