@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class Office365Server {
-    private final Session session;
-    private Message msg;
+    private final Message msg;
     private Multipart multipart;
 
     public Office365Server(String smtpServer,
@@ -21,16 +20,17 @@ public class Office365Server {
         prop.put("mail.smtp.host", smtpServer);
         prop.put("mail.smtp.port", smtpPort);
 
-        session = Session.getInstance(prop, new Authenticator() {
+        Session session = Session.getInstance(prop, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }
         });
+
+        msg = new MimeMessage(session);
     }
 
     public void newMsg() throws MessagingException {
-        msg = new MimeMessage(session);
         multipart = new MimeMultipart();
         msg.setContent(multipart);
     }
