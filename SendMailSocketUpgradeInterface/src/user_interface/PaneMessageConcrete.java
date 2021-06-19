@@ -1,6 +1,6 @@
 package user_interface;
 
-import user_interface.conrete_pane.PaneMessage;
+import user_interface.concrete_pane.PaneMessage;
 
 public final class PaneMessageConcrete extends PaneMessage {
     private static PaneMessageConcrete cache;

@@ -1,17 +1,17 @@
 .label{
-    -fx-font: normal 18 "Courier New";
+    -fx-font: normal 14 "Courier New";
 }
 .label-title{
     -fx-font-weight: bold;
 }
 .text-field{
-    -fx-font: normal 18 "Courier New";
+    -fx-font: normal 14 "Courier New";
 }
 .text-area {
-    -fx-font: normal 18 "Courier New";
+    -fx-font: normal 14 "Courier New";
 }
 .button{
-    -fx-font: normal 18 "Courier New";
+    -fx-font: normal 14 "Courier New";
     -fx-background-color: #f6f7f7;
 }
 .button:hover{
@@ -33,7 +33,7 @@
     -fx-padding: 25;
     -fx-background-color: #ffffff;
     -fx-pref-height: 500;
-    -fx-pref-width: 600;
+    -fx-pref-width: 750;
 }
 .white-background{
     -fx-background-color: #ffffff;

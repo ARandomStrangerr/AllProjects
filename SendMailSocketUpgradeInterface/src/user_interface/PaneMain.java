@@ -11,7 +11,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import user_interface.table_item.ReceiverInfo;
 
-import java.util.List;
+import java.util.ArrayList;
+
 
 public final class PaneMain extends PaneAbstract {
     //static components
@@ -49,7 +50,6 @@ public final class PaneMain extends PaneAbstract {
 
     @Override
     public void setup() {
-        mainPane.getStylesheets().add("stylesheet/universal.css");
         //menu
         MenuBar menuBar = new MenuBar();
         Menu settingMenu = new Menu("Cài đặt");
@@ -118,6 +118,7 @@ public final class PaneMain extends PaneAbstract {
         bodyGroup.getStyleClass().addAll("background", "spacing");
         //main pane
         mainPane.getChildren().addAll(menuBar, bodyGroup);
+        mainPane.getStylesheets().add("stylesheet/universal.css");
     }
 
     public String getMessageSubject() {
@@ -136,7 +137,7 @@ public final class PaneMain extends PaneAbstract {
         return tableView.getItems();
     }
 
-    public void setItems(ObservableList<ReceiverInfo> receiverInfos){
-        tableView.setItems(receiverInfos);
+    public void setItems(ObservableList<ReceiverInfo> receiverInfo){
+        tableView.setItems(receiverInfo);
     }
 }

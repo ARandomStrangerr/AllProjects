@@ -1,6 +1,6 @@
 package user_interface;
 
-import user_interface.conrete_pane.PaneYesNo;
+import user_interface.concrete_pane.PaneYesNo;
 
 public final class PaneYesNoConcrete extends PaneYesNo {
     private static PaneYesNoConcrete cache;

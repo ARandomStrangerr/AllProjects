@@ -164,5 +164,4 @@ public final class MainMenu extends SuperPane {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
     }
-
 }

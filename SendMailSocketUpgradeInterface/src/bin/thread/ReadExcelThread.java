@@ -4,7 +4,7 @@ import bin.command.OpenMessageWindow;
 import bin.file.ExcelFile;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import user_interface.conrete_pane.MainPane;
+import user_interface.PaneMain;
 import user_interface.table_item.ReceiverInfo;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public final class ReadExcelThread implements Runnable {
             for (List<String> row : excelFile.read(path)) items.add(new ReceiverInfo(row.get(0), row.get(1)));
         } catch (IOException e) {
             System.err.println("Cannot read file");
-            Platform.runLater(() -> new OpenMessageWindow("Không đọc được file chỉ định", MainPane.getInstance().getWindow()));
+            Platform.runLater(() -> new OpenMessageWindow("Không đọc được file chỉ định", PaneMain.getInstance().getWindow()));
         }
     }
 }

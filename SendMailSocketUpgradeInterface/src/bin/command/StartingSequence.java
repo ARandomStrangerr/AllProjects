@@ -16,6 +16,7 @@ public final class StartingSequence implements CommandInterface {
 
     @Override
     public void execute() {
+        System.setProperty("configFileName", "config.txt");
         WindowAbstract mainWindow = new WindowRegular(primeStage);
         PaneAbstract paneMain = PaneMain.getInstance(mainWindow);
         mainWindow.setPane(paneMain);
