@@ -1,17 +1,17 @@
 package user_interface;
 
-import bin.command.ChooseFileThenRunThread;
-import bin.command.RemoveEntryFromTable;
+import bin.command.*;
+import bin.thread.CreateInvoice;
 import bin.thread.ReadInvoiceFromExcel;
 import bin.thread.ReadMailFromExcel;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import user_interface.element.PaneInvoiceInfo;
 import user_interface.element.PaneSellerInfo;
 import user_interface.table_content.Invoice;
 import user_interface.table_content.Mail;
@@ -26,8 +26,10 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
     }
 
     //actual class
+    private final TextField folderTextField;
     private final Label invoiceTableTitleLabel,
-            mailTableTitleLabel;
+            mailTableTitleLabel,
+            folderTitleLabel;
     private final Button addFromExcelToInvoiceTableButton,
             removeEntryFromInvoiceTableButton,
             addFromExcelToMailTableButton,
@@ -36,12 +38,16 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
             createInvoiceAndSendMailButton;
     private final TableView<Invoice> invoiceTable;
     private final TableView<Mail> mailTable;
-    private final TableColumn<Invoice, String> personNameCol,
+    private final TableColumn<Invoice, String> invoiceTypeCol,
+            templateCodeCol,
+            invoiceSeriesCol,
+            personNameCol,
             personCodeCol,
             collectiveNameCol,
             collectiveTaxCodeCol,
             addressCol,
             paymentMethodCol;
+    private final TableColumn<Invoice, Integer> taxRateCol;
     private final TableColumn<Mail, String> idCol,
             mailCol;
     private final Region region1,
@@ -51,12 +57,15 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
     private final HBox wrapperFirstLine,
             wrapperSecondLine,
             wrapperThirdLine,
-            wrapperFourthLine;
+            wrapperFourthLine,
+            wrapperFifthLine;
     private final ScrollPane innerMainPane;
     private final VBox mainPane;
 
     private PaneCreateInvoiceFromExcel() {
         super(new VBox());
+        folderTextField = new TextField();
+        folderTitleLabel = new Label("Đường dẫn lưu file");
         invoiceTableTitleLabel = new Label("Bảng thông tin hoá đơn");
         mailTableTitleLabel = new Label("Danh sách hộp thư");
         addFromExcelToInvoiceTableButton = new Button("+");
@@ -67,12 +76,16 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
         createInvoiceAndSendMailButton = new Button("Tạo hoá đơn và gởi");
         invoiceTable = new TableView<>();
         mailTable = new TableView<>();
+        invoiceTypeCol = new TableColumn<>("Loại hoá đơn");
+        templateCodeCol = new TableColumn<>("Mẫu hoá đơn");
+        invoiceSeriesCol = new TableColumn<>("Kí hiệu");
         personNameCol = new TableColumn<>("Tên người mua");
         personCodeCol = new TableColumn<>("Mã người mua");
         collectiveNameCol = new TableColumn<>("Tên đơn vị");
         collectiveTaxCodeCol = new TableColumn<>("Mã số thuế");
         addressCol = new TableColumn<>("Địa chỉ");
         paymentMethodCol = new TableColumn<>("Phương thức thanh toán");
+        taxRateCol = new TableColumn<>("Thuế");
         idCol = new TableColumn<>("Mã người mua");
         mailCol = new TableColumn<>("Địa chỉ hộp thư");
         region1 = new Region();
@@ -83,6 +96,7 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
         wrapperSecondLine = new HBox();
         wrapperThirdLine = new HBox();
         wrapperFourthLine = new HBox();
+        wrapperFifthLine = new HBox();
         innerMainPane = new ScrollPane();
         mainPane = new VBox();
         setup();
@@ -91,21 +105,35 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
     @Override
     protected void setup() {
         //columns
+        invoiceTypeCol.setCellValueFactory(new PropertyValueFactory<>("invoiceType"));
+        templateCodeCol.setCellValueFactory(new PropertyValueFactory<>("templateCode"));
+        invoiceSeriesCol.setCellValueFactory(new PropertyValueFactory<>("invoiceSeries"));
         personNameCol.setCellValueFactory(new PropertyValueFactory<>("personName"));
         personCodeCol.setCellValueFactory(new PropertyValueFactory<>("personCode"));
         collectiveNameCol.setCellValueFactory(new PropertyValueFactory<>("collectiveName"));
         collectiveTaxCodeCol.setCellValueFactory(new PropertyValueFactory<>("collectiveTaxCode"));
         addressCol.setCellValueFactory(new PropertyValueFactory<>("address"));
         paymentMethodCol.setCellValueFactory(new PropertyValueFactory<>("paymentMethod"));
+        taxRateCol.setCellValueFactory(new PropertyValueFactory<>("taxRate"));
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         mailCol.setCellValueFactory(new PropertyValueFactory<>("mail"));
         //tables
+        invoiceTable.setOnMouseClicked(event -> {
+            if (event.getButton().equals(MouseButton.PRIMARY)
+                    && event.getClickCount() == 2) {
+                new OpenIndividualItem(invoiceTable.getSelectionModel().getSelectedItem()).execute();
+            }
+        });
+        invoiceTable.getColumns().add(invoiceTypeCol);
+        invoiceTable.getColumns().add(templateCodeCol);
+        invoiceTable.getColumns().add(invoiceSeriesCol);
         invoiceTable.getColumns().add(personNameCol);
         invoiceTable.getColumns().add(personCodeCol);
         invoiceTable.getColumns().add(collectiveNameCol);
         invoiceTable.getColumns().add(collectiveTaxCodeCol);
         invoiceTable.getColumns().add(addressCol);
         invoiceTable.getColumns().add(paymentMethodCol);
+        invoiceTable.getColumns().add(taxRateCol);
         mailTable.getColumns().add(idCol);
         mailTable.getColumns().add(mailCol);
         //regions
@@ -121,17 +149,16 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
         addFromExcelToInvoiceTableButton.getStyleClass().add("green-button");
         addFromExcelToInvoiceTableButton.setOnAction(event ->
                 new ChooseFileThenRunThread(this.getWindow(),
-                        new ReadInvoiceFromExcel()
-                ).execute());
+                        new ReadInvoiceFromExcel()).execute());
         removeEntryFromInvoiceTableButton.getStyleClass().add("red-button");
         removeEntryFromInvoiceTableButton.setOnAction(event -> new RemoveEntryFromTable(invoiceTable).execute());
         addFromExcelToMailTableButton.getStyleClass().add("green-button");
-        addFromExcelToInvoiceTableButton.setOnAction(even ->
+        addFromExcelToMailTableButton.setOnAction(even ->
                 new ChooseFileThenRunThread(this.getWindow(),
-                        ReadMailFromExcel.getInstance()
-                ).execute());
+                        ReadMailFromExcel.getInstance()).execute());
         removeEntryFromMailTableButton.getStyleClass().add("red-button");
         removeEntryFromMailTableButton.setOnAction(event -> new RemoveEntryFromTable(mailTable).execute());
+        onlyCreateInvoiceButton.setOnAction(event -> new OpenLoginWindow().execute());
         //panes
         wrapperFirstLine.getStyleClass().addAll("alignment", "spacing");
         wrapperFirstLine.getChildren().addAll(invoiceTableTitleLabel,
@@ -146,10 +173,12 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
                 removeEntryFromMailTableButton);
         wrapperFourthLine.getChildren().addAll(region4,
                 createInvoiceAndSendMailButton);
+        wrapperFifthLine.getChildren().addAll(folderTitleLabel,
+                folderTextField);
         mainPane.getChildren().addAll(PaneSellerInfo.getInstance().getMainPane(),
-                PaneInvoiceInfo.getInstance().getMainPane(),
                 wrapperFirstLine,
                 invoiceTable,
+                wrapperFifthLine,
                 wrapperSecondLine,
                 wrapperThirdLine,
                 mailTable,
@@ -167,5 +196,9 @@ public final class PaneCreateInvoiceFromExcel extends PaneAbstract {
 
     public ObservableList<Mail> getMailTableItems() {
         return mailTable.getItems();
+    }
+
+    public String getFolder(){
+        return folderTextField.getText();
     }
 }

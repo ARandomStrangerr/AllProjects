@@ -59,7 +59,6 @@ public final class GetPdfBill implements Runnable {
                 sb.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue()));
             }
             String body = sb.toString();
-//            System.out.println(body);
             String feedback;
             try {
                 feedback = connection.send(body);
@@ -67,7 +66,6 @@ public final class GetPdfBill implements Runnable {
                 e.printStackTrace();
                 continue;
             }
-//            System.out.println(feedback);
             feedback = feedback.substring(feedback.indexOf("fileToBytes") + 14, feedback.indexOf("paymentStatus") - 3);
             try {
                 OutputStream out = new FileOutputStream(folderPath + URLEncoder.encode(parameter.get("invoiceNo")) + ".pdf");

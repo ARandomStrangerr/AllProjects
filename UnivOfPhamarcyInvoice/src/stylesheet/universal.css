@@ -1,0 +1,84 @@
+.label{
+    -fx-font: normal 18 "calibri";
+}
+
+.button{
+    -fx-font: normal 18 "calibri" ;
+    -fx-background-color: #f8f9fa;
+}
+
+.button: hover{
+    -fx-background-color: #e9ecef;
+}
+
+.text-field{
+    -fx-font: normal 18 "calibri" ;
+}
+
+.padding{
+    -fx-padding: 25;
+}
+
+.spacing{
+    -fx-spacing: 20;
+}
+
+#body{
+    -fx-spacing: 20;
+    -fx-hgap:10;
+    -fx-vgap:10;
+    -fx-padding: 25;
+    -fx-background-color: white;
+}
+
+#gridPane{
+    -fx-hgap:10;
+    -fx-vgap:10;
+}
+
+#paneMessage{
+    -fx-border-width: 5 0 0 0;
+    -fx-border-color: #52b788;
+}
+
+#paneMessageLower{
+    -fx-padding: 25;
+}
+
+#paneMessageUpper{
+    -fx-padding: 25;
+    -fx-spacing: 10;
+    -fx-background-color: white;
+}
+
+#paneYesNo{
+    -fx-border-width: 5 0 0 0;
+    -fx-border-color: #ec008c;
+}
+
+#paneYesNoLower{
+    -fx-padding: 25;
+    -fx-spacing: 10;
+}
+
+#paneYesNoUpper{
+    -fx-padding: 25;
+    -fx-spacing: 10;
+    -fx-background-color: white;
+}
+
+#greenButton{
+    -fx-background-color: #edfcf5;
+}
+
+#greenButton: hover{
+    -fx-background-color: #9ad5a8;
+}
+
+#redButton {
+    -fx-background-color: #fff0f3;
+}
+
+#redButton: hover{
+    -fx-background-color: #ff8fa3;
+}

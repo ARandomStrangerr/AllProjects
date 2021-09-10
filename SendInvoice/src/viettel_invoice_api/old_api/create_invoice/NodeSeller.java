@@ -5,6 +5,11 @@ import node.NodeSingleValue;
 
 public final class NodeSeller {
     private NodeNamedCurlyBrace root;
+    public NodeNamedCurlyBrace setSellerInfo(){
+        root  = new NodeNamedCurlyBrace("sellerInfo");
+        return root;
+    }
+
     public NodeNamedCurlyBrace setSellerInfo(String name,
                                              String taxCode,
                                              String address)

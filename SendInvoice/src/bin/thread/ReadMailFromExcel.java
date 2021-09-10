@@ -51,4 +51,8 @@ public final class ReadMailFromExcel extends ReadFileRunnable {
             return;
         }
     }
+
+    public TreeMap<String ,String> getMailMap(){
+        return treeMap;
+    }
 }

@@ -1,4 +1,4 @@
-package viettel_electronic_invoice_webservice.connection;
+package viettel_invoice_api.connection;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -17,7 +17,7 @@ public final class Connection {
             this.address = address;
         }
 
-        public String getString() {
+        String getString() {
             return address;
         }
     }
@@ -31,7 +31,7 @@ public final class Connection {
             this.action = action;
         }
 
-        public String getString() {
+        String getString() {
             return action;
         }
     }

@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import user_interface.PaneAbstract;
+import user_interface.table_content.Item;
 
 public final class PaneInvoiceInfo extends PaneAbstract {
     //singleton
@@ -65,19 +66,31 @@ public final class PaneInvoiceInfo extends PaneAbstract {
                 templateCodeTextField);
         mainPane.getChildren().addAll(titleLabel,
                 wrapperFirstLine);
-        wrapperFirstLine.getStyleClass().addAll("alignment","spacing");
+        wrapperFirstLine.getStyleClass().addAll("alignment", "spacing");
         mainPane.getStyleClass().add("spacing");
     }
 
-    public String getInvoiceSeries(){
+    public void setInvoiceSeriesTextField(String value) {
+        this.invoiceSeriesTextField.setText(value);
+    }
+
+    public String getInvoiceSeries() {
         return invoiceSeriesTextField.getText();
     }
 
-    public String getTemplateCode(){
+    public void setTemplateCodeTextField(String value) {
+        this.invoiceSeriesTextField.setText(value);
+    }
+
+    public String getTemplateCode() {
         return templateCodeTextField.getText();
     }
 
-    public String getInvoiceType(){
+    public void setInvoiceTypeChoiceBox(String value) {
+        invoiceTypeChoiceBox.setValue(value);
+    }
+
+    public String getInvoiceType() {
         return invoiceTypeChoiceBox.getValue();
     }
 }

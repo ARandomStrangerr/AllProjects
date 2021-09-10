@@ -1,7 +1,5 @@
 package user_interface.element;
 
-import bin.command.SaveProperties;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -63,8 +61,20 @@ public final class PaneSellerInfo extends PaneAbstract {
         wrapperSecondLine.getChildren().addAll(addressLabel, addressTextField);
         mainPane.getChildren().addAll(titleLabel, wrapperFirstLine, wrapperSecondLine);
 
-        wrapperFirstLine.getStyleClass().addAll("alignment","spacing");
-        wrapperSecondLine.getStyleClass().addAll("alignment","spacing");
+        wrapperFirstLine.getStyleClass().addAll("alignment", "spacing");
+        wrapperSecondLine.getStyleClass().addAll("alignment", "spacing");
         mainPane.getStyleClass().add("spacing");
+    }
+
+    public String getName() {
+        return nameTextField.getText();
+    }
+
+    public String getTaxCode() {
+        return taxCodeTextField.getText();
+    }
+
+    public String getAddress() {
+        return taxCodeTextField.getText();
     }
 }

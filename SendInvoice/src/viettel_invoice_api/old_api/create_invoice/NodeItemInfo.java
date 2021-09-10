@@ -14,8 +14,8 @@ public final class NodeItemInfo {
     public void addItem(String name,
                         long price,
                         int quantity,
-                        long itemTotalAmountWithoutTax,
-                        int taxPercentage)
+                        long totalAmountWithoutTax,
+                        long taxAmount)
             throws NullPointerException,
             IllegalCallerException {
         if (name == null || name.trim().isEmpty()) throw new NullPointerException();
@@ -31,9 +31,9 @@ public final class NodeItemInfo {
                 nodeQuantity = new NodeSingleValue("quantity",
                         quantity),
                 nodeItemTotalAmountWithoutTax = new NodeSingleValue("itemTotalAmountWithoutTax",
-                        itemTotalAmountWithoutTax),
-                nodeTaxPercentage = new NodeSingleValue("taxPercentage",
-                        taxPercentage);
+                        totalAmountWithoutTax),
+                nodeTaxAmount = new NodeSingleValue("taxAmount",
+                        taxAmount);
         NodeCurlyBrace wrapper = new NodeCurlyBrace();
         wrapper.addAll(nodeLineNumber,
                 nodeSelection,
@@ -42,7 +42,7 @@ public final class NodeItemInfo {
                 nodeQuantity,
                 nodeItemName,
                 nodeItemTotalAmountWithoutTax,
-                nodeTaxPercentage);
+                nodeTaxAmount);
         root.add(wrapper);
     }
     public void reset(){
