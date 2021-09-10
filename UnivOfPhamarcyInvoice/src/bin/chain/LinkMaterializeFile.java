@@ -30,6 +30,7 @@ public class LinkMaterializeFile extends Link {
             try {
                 FileOutputStream fos = new FileOutputStream(file);
                 fos.write(decodedFile);
+                fos.close();
             } catch (IOException e){
 
             }

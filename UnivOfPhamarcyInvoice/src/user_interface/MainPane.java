@@ -4,10 +4,13 @@ import bin.chain.ChainGetInvoice;
 import bin.chain.ChainSendInvoice;
 import bin.command.*;
 import chain_of_responsibility.Chain;
+import com.google.gson.JsonObject;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+
+import java.util.List;
 
 public final class MainPane extends PaneAbstract {
 
@@ -134,7 +137,10 @@ public final class MainPane extends PaneAbstract {
         saveButton.setOnAction(event -> {
             setProperty(usernameTextField.getId(), usernameTextField.getText());
             setProperty(passwordTextField.getId(), passwordTextField.getText());
-            setProperty(excelPathFileTextField.getId(), excelPathFileTextField.getText());
+            try {
+                setProperty(excelPathFileTextField.getId(), excelPathFileTextField.getText());
+            } catch (Exception ignore) {
+            }
             setProperty(invoiceTypeChoiceBox.getId(), invoiceTypeChoiceBox.getValue());
             setProperty(templateCodeTextField.getId(), templateCodeTextField.getText());
             setProperty(invoiceSeriesTextField.getId(), invoiceSeriesTextField.getText());
@@ -148,13 +154,21 @@ public final class MainPane extends PaneAbstract {
             Runnable runnable = () -> {
                 Chain sendInvoiceChain = new ChainSendInvoice(excelPathFileTextField.getText());
                 if (sendInvoiceChain.handle()) {
+                    List<JsonObject> responseMsgList = (List<JsonObject>) sendInvoiceChain.getProcessObject();
+                    String startIndexInvoice = responseMsgList.get(0).getAsJsonObject().get("invoiceNo").getAsString(),
+                            endIndexInvoice = responseMsgList.get(responseMsgList.size() - 1).getAsJsonObject().get("invoiceNo").getAsString(),
+                            response = String.format("Thành công\nSố bắt đầu: %s\nSố kết thúc: %s", startIndexInvoice, endIndexInvoice);
                     Platform.runLater(() -> {
-                        MessagePane.getInstance().setMsg("Thành công");
+                        MessagePane.getInstance().setMsg(response);
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 } else {
+                    List<JsonObject> responseMsgList = (List<JsonObject>) sendInvoiceChain.getProcessObject();
+                    String startIndexInvoice = responseMsgList.get(0).getAsJsonObject().get("invoiceNo").getAsString(),
+                            endIndexInvoice = responseMsgList.get(responseMsgList.size() - 1).getAsJsonObject().get("invoiceNo").getAsString(),
+                            response = String.format("Đã gởi một phần dữ liệu\nSố bắt đầu: %s\nSố kết thúc: %s\n%s", startIndexInvoice, endIndexInvoice, sendInvoiceChain.getErrorMessage());
                     Platform.runLater(() -> {
-                        MessagePane.getInstance().setMsg(sendInvoiceChain.getErrorMessage());
+                        MessagePane.getInstance().setMsg(response);
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 }
@@ -179,7 +193,7 @@ public final class MainPane extends PaneAbstract {
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 }
-                Platform.runLater(() ->BlockMessagePane.getInstance().getWindow().closeCurrentStage());
+                Platform.runLater(() -> BlockMessagePane.getInstance().getWindow().closeCurrentStage());
             };
             new Thread(runnable).start();
         });

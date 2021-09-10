@@ -30,11 +30,11 @@ public class SendThread implements Runnable {
         ObservableList<ReceiverInfo> unsentItems = FXCollections.observableArrayList();
         Map<String, String> map = new LinkedHashMap<>();
         TextFile textFile = TextFile.getInstance();
-        if (messageBody.isBlank()) {
+        if (messageBody.isEmpty()) {
             Platform.runLater(() -> new OpenMessageWindow("Nội dung thư chưa được điền", PaneMain.getInstance().getWindow()).execute());
             return;
         }
-        if (messageSubject.isBlank()) {
+        if (messageSubject.isEmpty()) {
             Platform.runLater(() -> new OpenMessageWindow("Tiêu đề thư chưa được điền", PaneMain.getInstance().getWindow()).execute());
         }
         if (items.isEmpty()) {
@@ -70,7 +70,7 @@ public class SendThread implements Runnable {
         Platform.runLater(() -> new OpenUncloseableMessageWindow("Vui lòng đợi", paneMain.getWindow()).execute());
         while (!items.isEmpty()) {
             ReceiverInfo currentItem = items.remove(0);
-            String attachmentFilePath = attachmentFolder.isEmpty() || currentItem.getVariableField().isEmpty() ? null : attachmentFolder + (char) 47 + currentItem.getVariableField();
+            String attachmentFilePath = attachmentFolder.isEmpty() || currentItem.getVariableField().isEmpty() ? null : attachmentFolder + (char) 92 + currentItem.getVariableField();
             try {
                 server.newMsg();
                 server.setSender(map.get("username"));
@@ -79,7 +79,7 @@ public class SendThread implements Runnable {
                 server.setBody(messageBody);
                 if (attachmentFilePath != null) server.setAttachment(attachmentFilePath);
                 server.send();
-            } catch (MessagingException | IOException e) {
+        } catch (MessagingException | IOException e) {
                 unsentItems.add(currentItem);
             }
             String displayMsg = "Còn " + items.size();

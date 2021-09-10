@@ -73,6 +73,7 @@ public class Send implements CommandInterface {
         Thread mailSendThread = new Thread(() -> {
             ObservableList<ReceiverInfo> errorList = FXCollections.observableArrayList();
             CustomMailServer mail = new CustomMailServer();
+
             while (!receiverInfo.isEmpty()) {
                 ReceiverInfo receiver = receiverInfo.remove(0);
                 String path = folderPath == null || receiver.getAttachmentFileName() == null ? null : folderPath + (char) 92 + receiver.getAttachmentFileName();

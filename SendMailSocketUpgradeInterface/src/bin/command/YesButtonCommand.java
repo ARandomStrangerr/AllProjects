@@ -25,8 +25,8 @@ public final class YesButtonCommand implements CommandInterface {
                 password = paneServerInfo.getPassword();
         if (address.isEmpty()
                 || port.isEmpty()
-                || username.isBlank()
-                || password.isBlank()) {
+                || username.isEmpty()
+                || password.isEmpty()) {
             new OpenMessageWindow("Chưa điền đủ thông tin", PaneYesNoConcrete.getInstance().getWindow()).execute();
             return;
         }
