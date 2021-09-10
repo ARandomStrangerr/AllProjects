@@ -39,6 +39,7 @@ public final class LinkCreateJsonObject extends Link {
         sendObjects = new LinkedList<>();
         int index = 1; //index to print out the line which is contain error when read the excel file
         for (List<String> row : dataFromExcel) {
+            if (row.size() == 0) continue;
             rootObject = new JsonObject();
             //generalInvoiceInfo
             tempObj = new JsonObject();
@@ -79,9 +80,6 @@ public final class LinkCreateJsonObject extends Link {
             }
             switch (tempInt) {
                 case 1:
-                case 3:
-                case 5:
-                case 7:
                     tempObj.addProperty("adjustmentType", tempInt);
                     break;
                 default:
@@ -144,6 +142,7 @@ public final class LinkCreateJsonObject extends Link {
             for (int cellIndex = 18; cellIndex < row.size(); cellIndex++) {
                 tempObj = new JsonObject(); //object for each item
                 String[] tempArrString = row.get(cellIndex).split(";"); //array for each item cell
+                if (tempArrString.length == 0) continue;
                 tempInt = Integer.parseInt(tempArrString[0].trim()); //selection
                 switch (tempInt) {
                     case 1:
@@ -178,6 +177,15 @@ public final class LinkCreateJsonObject extends Link {
                         tempLong = tempObj.get("quantity").getAsInt() * tempObj.get("unitPrice").getAsLong();
                         tempObj.addProperty("itemTotalAmountWithoutTax", tempLong);
                         tempObj.addProperty("taxPercentage", taxRate);
+                        try {
+                            tempObj.addProperty("discount", Float.parseFloat(tempArrString[6].trim()));
+                        } catch (NumberFormatException e){
+                            chain.setErrorMessage("Phần trăm chiết khấu 1 không hợp lệ ở dòng số " + index);
+                        }try {
+                        tempObj.addProperty("discount2", Float.parseFloat(tempArrString[7].trim()));
+                    } catch (NumberFormatException e){
+                        chain.setErrorMessage("Phần trăm chiết khấu 2 không hợp lệ ở dòng số " + index);
+                    }
                         break;
                     default:
                         chain.setErrorMessage("Đánh dấu loại hàng hóa/dịch vụ không chính xác tại dòng " + index);
@@ -186,7 +194,8 @@ public final class LinkCreateJsonObject extends Link {
                 tempArray.add(tempObj);
             }
             rootObject.add("itemInfo", tempArray);
-
+            rootObject.add("summarizeInfo", new JsonObject());
+            rootObject.add("taxBreakdowns", new JsonArray());
             sendObjects.add(rootObject);
             index++;
         }

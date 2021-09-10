@@ -89,8 +89,11 @@ public final class LinkSendJsonObject extends Link {
 
                 br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String input = br.readLine();
-                System.out.println(input);
                 jsonObj = gson.fromJson(input, JsonObject.class);
+                if (!jsonObj.get("errorCode").isJsonNull()){
+                    chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
+                    return false;
+                }
                 responseObjectsCollection.add(jsonObj);
                 br.close();
                 bw.close();
