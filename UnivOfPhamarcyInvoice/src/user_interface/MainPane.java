@@ -139,9 +139,9 @@ public final class MainPane extends PaneAbstract {
             setProperty(passwordTextField.getId(), passwordTextField.getText());
             try {
                 setProperty(excelPathFileTextField.getId(), excelPathFileTextField.getText());
+                setProperty(invoiceTypeChoiceBox.getId(), invoiceTypeChoiceBox.getValue());
             } catch (Exception ignore) {
             }
-            setProperty(invoiceTypeChoiceBox.getId(), invoiceTypeChoiceBox.getValue());
             setProperty(templateCodeTextField.getId(), templateCodeTextField.getText());
             setProperty(invoiceSeriesTextField.getId(), invoiceSeriesTextField.getText());
             setProperty(saveFolderPathTextField.getId(), saveFolderPathTextField.getText());
@@ -163,16 +163,22 @@ public final class MainPane extends PaneAbstract {
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 } else {
-                    List<JsonObject> responseMsgList = (List<JsonObject>) sendInvoiceChain.getProcessObject();
-                    String startIndexInvoice = responseMsgList.get(0).getAsJsonObject().get("invoiceNo").getAsString(),
-                            endIndexInvoice = responseMsgList.get(responseMsgList.size() - 1).getAsJsonObject().get("invoiceNo").getAsString(),
-                            response = String.format("Đã gởi một phần dữ liệu\nSố bắt đầu: %s\nSố kết thúc: %s\n%s", startIndexInvoice, endIndexInvoice, sendInvoiceChain.getErrorMessage());
+                    String response;
+                    try {
+                        List<JsonObject> responseMsgList = (List<JsonObject>) sendInvoiceChain.getProcessObject();
+                        String startIndexInvoice = responseMsgList.get(0).getAsJsonObject().get("invoiceNo").getAsString(),
+                                endIndexInvoice = responseMsgList.get(responseMsgList.size() - 1).getAsJsonObject().get("invoiceNo").getAsString();
+                        response = String.format("Đã gởi một phần dữ liệu\nSố bắt đầu: %s\nSố kết thúc: %s\n%s", startIndexInvoice, endIndexInvoice, sendInvoiceChain.getErrorMessage());
+                    } catch (ClassCastException e) {
+                        response = String.format("Lỗi: %s", sendInvoiceChain.getErrorMessage());
+                    }
+                    String finalResponse = response;
                     Platform.runLater(() -> {
-                        MessagePane.getInstance().setMsg(response);
+                        MessagePane.getInstance().setMsg(finalResponse);
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 }
-                BlockMessagePane.getInstance().getWindow().closeCurrentStage();
+                Platform.runLater(() -> BlockMessagePane.getInstance().getWindow().closeCurrentStage());
             };
             new Thread(runnable).start();
         });
