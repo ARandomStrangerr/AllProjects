@@ -35,7 +35,6 @@ public class LinkGetInvoiceJsonObject extends Link {
             jsonObj.addProperty("fileType", "PDF");
             sendObject.add(jsonObj);
         }
-        System.out.println(sendObject.size());
         chain.setProcessObject(sendObject);
         return true;
     }

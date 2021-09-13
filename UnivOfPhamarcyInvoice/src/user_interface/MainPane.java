@@ -135,16 +135,16 @@ public final class MainPane extends PaneAbstract {
         selectFileButton.setOnAction(event -> new CommandSetFilePath(this.getWindow(), excelPathFileTextField).execute());
         selectFolderButton.setOnAction(event -> new CommandSetFolderPath(this.getWindow(), saveFolderPathTextField).execute());
         saveButton.setOnAction(event -> {
-            setProperty(usernameTextField.getId(), usernameTextField.getText());
-            setProperty(passwordTextField.getId(), passwordTextField.getText());
             try {
+                setProperty(usernameTextField.getId(), usernameTextField.getText());
+                setProperty(passwordTextField.getId(), passwordTextField.getText());
                 setProperty(excelPathFileTextField.getId(), excelPathFileTextField.getText());
                 setProperty(invoiceTypeChoiceBox.getId(), invoiceTypeChoiceBox.getValue());
+                setProperty(templateCodeTextField.getId(), templateCodeTextField.getText());
+                setProperty(invoiceSeriesTextField.getId(), invoiceSeriesTextField.getText());
+                setProperty(saveFolderPathTextField.getId(), saveFolderPathTextField.getText());
             } catch (Exception ignore) {
             }
-            setProperty(templateCodeTextField.getId(), templateCodeTextField.getText());
-            setProperty(invoiceSeriesTextField.getId(), invoiceSeriesTextField.getText());
-            setProperty(saveFolderPathTextField.getId(), saveFolderPathTextField.getText());
             new SaveProperties().execute();
         });
         createInvoiceButton.setOnAction(event -> {

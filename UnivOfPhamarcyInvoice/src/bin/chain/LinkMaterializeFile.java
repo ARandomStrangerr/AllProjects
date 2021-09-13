@@ -35,6 +35,6 @@ public class LinkMaterializeFile extends Link {
 
             }
         }
-        return false;
+        return true;
     }
 }
