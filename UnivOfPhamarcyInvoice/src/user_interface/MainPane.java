@@ -139,15 +139,27 @@ public final class MainPane extends PaneAbstract {
         selectFolderButton.setOnAction(event -> new CommandSetFolderPath(this.getWindow(), saveFolderPathTextField).execute());
         saveButton.setOnAction(event -> {
             try {
-                setProperty(usernameTextField.getId(), usernameTextField.getText());
-                setProperty(passwordTextField.getId(), passwordTextField.getText());
-                setProperty(excelPathFileTextField.getId(), excelPathFileTextField.getText());
-                setProperty(invoiceTypeChoiceBox.getId(), invoiceTypeChoiceBox.getValue());
-                setProperty(templateCodeTextField.getId(), templateCodeTextField.getText());
                 setProperty(invoiceSeriesTextField.getId(), invoiceSeriesTextField.getText());
-                setProperty(saveFolderPathTextField.getId(), saveFolderPathTextField.getText());
             } catch (Exception ignore) {
             }
+            try{
+                setProperty(passwordTextField.getId(), passwordTextField.getText());
+            }catch (Exception ignore){}
+            try{
+                setProperty(excelPathFileTextField.getId(), excelPathFileTextField.getText());
+            }catch (Exception ignore){}
+            try{
+                setProperty(usernameTextField.getId(), usernameTextField.getText());
+            }catch (Exception ignore){}
+            try{
+                setProperty(invoiceTypeChoiceBox.getId(), invoiceTypeChoiceBox.getValue());
+            }catch (Exception ignore){}
+            try{
+                setProperty(templateCodeTextField.getId(), templateCodeTextField.getText());
+            }catch (Exception ignore){}
+            try{
+                setProperty(saveFolderPathTextField.getId(), saveFolderPathTextField.getText());
+            }catch (Exception ignore){}
             new SaveProperties().execute();
         });
         createInvoiceButton.setOnAction(event -> {

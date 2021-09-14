@@ -143,7 +143,7 @@ public final class LinkCreateJsonObject extends Link {
                 for (int cellIndex = 18; cellIndex < row.size(); cellIndex++) {
                     tempObj = new JsonObject(); //object for each item
                     tempString = row.get(cellIndex).trim();
-                    if (tempString.isBlank()) break;
+                    if (tempString.isEmpty()) break;
                     String[] tempArrString = tempString.split(";"); //array for each item cell
                     tempInt = Integer.parseInt(tempArrString[0].trim()); //selection
                     switch (tempInt) {
