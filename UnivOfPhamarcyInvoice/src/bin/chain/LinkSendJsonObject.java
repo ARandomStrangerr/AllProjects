@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import user_interface.BlockMessagePane;
 import user_interface.PaneAbstract;
 
+import javax.net.ssl.SSLException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -73,8 +74,10 @@ public final class LinkSendJsonObject extends Link {
         //send object
         responseObjectsCollection = new LinkedList<>();
         iterationNumber = 1;
+        System.out.println(accessToken); //todo delete this
         try {
             for (JsonObject jsonObject : sendObjectsCollection) {
+                System.out.println(jsonObject); //todo delete this
                 con = (HttpURLConnection) new URL(address).openConnection();
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json");
@@ -91,7 +94,7 @@ public final class LinkSendJsonObject extends Link {
                 String input = br.readLine();
                 System.out.println(input); //todo delete this
                 jsonObj = gson.fromJson(input, JsonObject.class);
-                if (!jsonObj.get("description").isJsonNull()){
+                if (!jsonObj.get("description").getAsString().isEmpty()){
                     chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
                     chain.setProcessObject(responseObjectsCollection);
                     return false;

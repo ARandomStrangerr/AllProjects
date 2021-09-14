@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 
 import java.util.List;
 
@@ -132,7 +133,9 @@ public final class MainPane extends PaneAbstract {
         saveFolderPathTextField.setText((String) getProperty("saveFolder"));
 
         //button
-        selectFileButton.setOnAction(event -> new CommandSetFilePath(this.getWindow(), excelPathFileTextField).execute());
+        selectFileButton.setOnAction(event ->
+            excelPathFileTextField.setText(new FileChooser().showOpenDialog(getWindow().getCurrentStage()).getAbsolutePath())
+        );
         selectFolderButton.setOnAction(event -> new CommandSetFolderPath(this.getWindow(), saveFolderPathTextField).execute());
         saveButton.setOnAction(event -> {
             try {
@@ -154,6 +157,7 @@ public final class MainPane extends PaneAbstract {
             Runnable runnable = () -> {
                 Chain sendInvoiceChain = new ChainSendInvoice(excelPathFileTextField.getText());
                 if (sendInvoiceChain.handle()) {
+                    Platform.runLater(() -> BlockMessagePane.getInstance().getWindow().closeCurrentStage());
                     List<JsonObject> responseMsgList = (List<JsonObject>) sendInvoiceChain.getProcessObject();
                     String startIndexInvoice = responseMsgList.get(0).getAsJsonObject().get("invoiceNo").getAsString(),
                             endIndexInvoice = responseMsgList.get(responseMsgList.size() - 1).getAsJsonObject().get("invoiceNo").getAsString(),
@@ -163,13 +167,14 @@ public final class MainPane extends PaneAbstract {
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 } else {
+                    Platform.runLater(() -> BlockMessagePane.getInstance().getWindow().closeCurrentStage());
                     String response;
                     try {
                         List<JsonObject> responseMsgList = (List<JsonObject>) sendInvoiceChain.getProcessObject();
                         String startIndexInvoice = responseMsgList.get(0).getAsJsonObject().get("invoiceNo").getAsString(),
                                 endIndexInvoice = responseMsgList.get(responseMsgList.size() - 1).getAsJsonObject().get("invoiceNo").getAsString();
                         response = String.format("Đã gởi một phần dữ liệu\nSố bắt đầu: %s\nSố kết thúc: %s\n%s", startIndexInvoice, endIndexInvoice, sendInvoiceChain.getErrorMessage());
-                    } catch (ClassCastException e) {
+                    } catch (ClassCastException | NullPointerException e) {
                         response = String.format("Lỗi: %s", sendInvoiceChain.getErrorMessage());
                     }
                     String finalResponse = response;
@@ -178,7 +183,6 @@ public final class MainPane extends PaneAbstract {
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 }
-                Platform.runLater(() -> BlockMessagePane.getInstance().getWindow().closeCurrentStage());
             };
             new Thread(runnable).start();
         });

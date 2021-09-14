@@ -113,10 +113,10 @@ public final class LinkCreateJsonObject extends Link {
                     chain.setErrorMessage("Tên người mua hoặc tên đơn vị là bắt buộc ở dòng số " + index);
                     return false;
                 }
-                if (tempObj.has("buyerLegalName") && !tempObj.has("buyerTaxCode")) { //check if tax code is blank when the company name exists
-                    chain.setErrorMessage("Mã số thuế của đơn vị không được bỏ trống khi tên đơn vị được điền ở dòng số " + index);
-                    return false;
-                }
+//                if (tempObj.has("buyerLegalName") && !tempObj.has("buyerTaxCode")) { //check if tax code is blank when the company name exists
+//                    chain.setErrorMessage("Mã số thuế của đơn vị không được bỏ trống khi tên đơn vị được điền ở dòng số " + index);
+//                    return false;
+//                }
                 tempString = row.get(14).trim(); //address
                 if (tempString.isEmpty()) {
                     chain.setErrorMessage("Địa chỉ xuất hoá đơn bị bỏ trống ở dòng số " + index);
@@ -129,21 +129,22 @@ public final class LinkCreateJsonObject extends Link {
                 tempString = row.get(16).trim();
                 tempObj.addProperty("paymentMethodName", tempString);
                 tempArray = new JsonArray();
-                tempArray.add(tempString);
+                tempArray.add(tempObj);
                 rootObject.add("payments", tempArray);
                 //item info
                 tempArray = new JsonArray();
                 try { //check if the string is convertible to float
-                    taxRate = Float.parseFloat(row.get(15).trim());
+                    taxRate = Float.parseFloat(row.get(17).trim());
                 } catch (NumberFormatException e) {
-                    chain.setErrorMessage("Mức thuế xuất không chính xác");
+                    chain.setErrorMessage("Mức thuế xuất không chính xác ở dòng số " + index);
                     e.printStackTrace();
                     return false;
                 }
                 for (int cellIndex = 18; cellIndex < row.size(); cellIndex++) {
                     tempObj = new JsonObject(); //object for each item
-                    String[] tempArrString = row.get(cellIndex).split(";"); //array for each item cell
-                    if (tempArrString.length == 0) continue;
+                    tempString = row.get(cellIndex).trim();
+                    if (tempString.isBlank()) break;
+                    String[] tempArrString = tempString.split(";"); //array for each item cell
                     tempInt = Integer.parseInt(tempArrString[0].trim()); //selection
                     switch (tempInt) {
                         case 1:
@@ -159,7 +160,7 @@ public final class LinkCreateJsonObject extends Link {
                             tempObj.addProperty("unitName", tempString);
                             try {
                                 tempInt = Integer.parseInt(tempArrString[3].trim()); //quantity
-                                if (tempInt <= 0) throw new NumberFormatException("negative quantity");
+                                if (tempInt < 0) throw new NumberFormatException("negative quantity");
                             } catch (NumberFormatException e) {
                                 chain.setErrorMessage("Số lượng sản phẩm không hợp lệ");
                                 e.printStackTrace();
