@@ -15,6 +15,6 @@ public final class ChainSendInvoice extends Chain {
     protected void forgeChain() {
         super.addLink(new LinkReadExcelFile(this));
         super.addLink(new LinkCreateJsonObject(this));
-        super.addLink(new LinkSendJsonObject(this, Address.ADDRESS.value + API.CREATE_INVOICE.value + PaneAbstract.getProperty("username")));
+        super.addLink(new LinkSendJsonObject(this, Address.ADDRESS.value + API.CREATE_DRAFT_INVOICE.value + PaneAbstract.getProperty("username")));
     }
 }

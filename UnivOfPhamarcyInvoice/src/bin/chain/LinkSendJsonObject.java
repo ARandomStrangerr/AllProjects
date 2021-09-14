@@ -94,10 +94,18 @@ public final class LinkSendJsonObject extends Link {
                 String input = br.readLine();
                 System.out.println(input); //todo delete this
                 jsonObj = gson.fromJson(input, JsonObject.class);
-                if (!jsonObj.get("description").getAsString().isEmpty()){
-                    chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
-                    chain.setProcessObject(responseObjectsCollection);
-                    return false;
+                try {
+                    if (!jsonObj.get("description").getAsString().isEmpty()) {
+                        chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
+                        chain.setProcessObject(responseObjectsCollection);
+                        return false;
+                    }
+                } catch (UnsupportedOperationException e) {
+                    if (!jsonObj.get("description").isJsonNull()) {
+                        chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
+                        chain.setProcessObject(responseObjectsCollection);
+                        return false;
+                    }
                 }
                 responseObjectsCollection.add(jsonObj);
                 br.close();
