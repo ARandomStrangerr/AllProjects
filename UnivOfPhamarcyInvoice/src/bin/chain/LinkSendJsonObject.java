@@ -6,11 +6,11 @@ import chain_of_responsibility.Chain;
 import chain_of_responsibility.Link;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import file_operation.TextFile;
 import javafx.application.Platform;
 import user_interface.BlockMessagePane;
 import user_interface.PaneAbstract;
 
-import javax.net.ssl.SSLException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -71,13 +71,15 @@ public final class LinkSendJsonObject extends Link {
             return false;
         }
         accessToken = String.format("access_token=%s", jsonObj.get("access_token").getAsString());
+        try {
+            TextFile.getInstance().write("debug.txt", false, address);
+            TextFile.getInstance().write("debug.txt", true, accessToken);
+        }catch (IOException e){}
         //send object
         responseObjectsCollection = new LinkedList<>();
         iterationNumber = 1;
-        System.out.println(accessToken); //todo delete this
         try {
             for (JsonObject jsonObject : sendObjectsCollection) {
-                System.out.println(jsonObject); //todo delete this
                 con = (HttpURLConnection) new URL(address).openConnection();
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json");
@@ -89,10 +91,8 @@ public final class LinkSendJsonObject extends Link {
                 bw.write(jsonObject.toString());
                 bw.newLine();
                 bw.flush();
-
                 br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String input = br.readLine();
-                System.out.println(input); //todo delete this
                 jsonObj = gson.fromJson(input, JsonObject.class);
                 try {
                     if (!jsonObj.get("description").getAsString().isEmpty()) {
@@ -107,6 +107,7 @@ public final class LinkSendJsonObject extends Link {
                         return false;
                     }
                 }
+
                 responseObjectsCollection.add(jsonObj);
                 br.close();
                 bw.close();
@@ -116,7 +117,7 @@ public final class LinkSendJsonObject extends Link {
                 iterationNumber++;
             }
         } catch (IOException e) {
-            chain.setErrorMessage("Không thể thiết lập kết nối tới Internet");
+            chain.setErrorMessage(e.getMessage());
             e.printStackTrace();
             return false;
         }

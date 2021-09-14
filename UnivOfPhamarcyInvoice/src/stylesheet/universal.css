@@ -48,6 +48,7 @@
 #paneMessageUpper{
     -fx-padding: 25 60 25 60;
     -fx-spacing: 10;
+    -fx-max-width: 500px;
     -fx-background-color: white;
 }
 

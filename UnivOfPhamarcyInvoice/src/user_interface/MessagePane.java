@@ -22,6 +22,7 @@ public final class MessagePane extends PaneAbstract {
 
     @Override
     protected void setup() {
+        displayMsg.setWrapText(true);
         super.getMainPane().getChildren().add(displayMsg);
         super.getMainPane().setId("paneMessageUpper");
     }
