@@ -74,7 +74,8 @@ public final class LinkSendJsonObject extends Link {
         try {
             TextFile.getInstance().write("debug.txt", false, address);
             TextFile.getInstance().write("debug.txt", true, accessToken);
-        }catch (IOException e){}
+        } catch (IOException e) {
+        }
         //send object
         responseObjectsCollection = new LinkedList<>();
         iterationNumber = 1;
@@ -117,6 +118,14 @@ public final class LinkSendJsonObject extends Link {
                 iterationNumber++;
             }
         } catch (IOException e) {
+            br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+            try {
+                System.out.println(br.readLine());
+            } catch (IOException e1) {
+                chain.setErrorMessage(e1.getMessage());
+                e1.printStackTrace();
+                return false;
+            }
             chain.setErrorMessage(e.getMessage());
             e.printStackTrace();
             return false;
