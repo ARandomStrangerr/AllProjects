@@ -105,6 +105,7 @@ public final class MainPane extends PaneAbstract {
     }
 
     @Override
+    @SuppressWarnings("all")
     protected void setup() {
         //region
         HBox.setHgrow(createInvoiceButtonPaneRegion, Priority.ALWAYS);
@@ -168,30 +169,17 @@ public final class MainPane extends PaneAbstract {
             new OpenWindowPopup(BlockMessagePane.getInstance(), this.getWindow()).execute();
             Runnable runnable = () -> {
                 Chain sendInvoiceChain = new ChainSendInvoice(excelPathFileTextField.getText());
-                if (sendInvoiceChain.handle()) {
-                    Platform.runLater(() -> BlockMessagePane.getInstance().getWindow().closeCurrentStage());
-                    List<JsonObject> responseMsgList = (List<JsonObject>) sendInvoiceChain.getProcessObject();
-                    String startIndexInvoice = responseMsgList.get(0).getAsJsonObject().get("invoiceNo").getAsString(),
-                            endIndexInvoice = responseMsgList.get(responseMsgList.size() - 1).getAsJsonObject().get("invoiceNo").getAsString(),
-                            response = String.format("Thành công\nSố bắt đầu: %s\nSố kết thúc: %s", startIndexInvoice, endIndexInvoice);
+                sendInvoiceChain.handle();
+                Platform.runLater(() -> BlockMessagePane.getInstance().getWindow().closeCurrentStage());
+                if (sendInvoiceChain.getErrorMessage() != null){
                     Platform.runLater(() -> {
-                        MessagePane.getInstance().setMsg(response);
+                        MessagePane.getInstance().setMsg(sendInvoiceChain.getErrorMessage());
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 } else {
-                    Platform.runLater(() -> BlockMessagePane.getInstance().getWindow().closeCurrentStage());
-                    String response;
-                    try {
-                        List<JsonObject> responseMsgList = (List<JsonObject>) sendInvoiceChain.getProcessObject();
-                        String startIndexInvoice = responseMsgList.get(0).getAsJsonObject().get("invoiceNo").getAsString(),
-                                endIndexInvoice = responseMsgList.get(responseMsgList.size() - 1).getAsJsonObject().get("invoiceNo").getAsString();
-                        response = String.format("Đã gởi một phần dữ liệu\nSố bắt đầu: %s\nSố kết thúc: %s\n%s", startIndexInvoice, endIndexInvoice, sendInvoiceChain.getErrorMessage());
-                    } catch (ClassCastException | NullPointerException e) {
-                        response = String.format("Lỗi: %s", sendInvoiceChain.getErrorMessage());
-                    }
-                    String finalResponse = response;
+                    String displayMsg = String.format("Thành công gửi đi %d hóa đơn", ((List<JsonObject>) sendInvoiceChain.getProcessObject()).size());
                     Platform.runLater(() -> {
-                        MessagePane.getInstance().setMsg(finalResponse);
+                        MessagePane.getInstance().setMsg(displayMsg);
                         new OpenPaneMessage(MessagePane.getInstance(), PaneMessageConcrete.getInstance(), getWindow()).execute();
                     });
                 }

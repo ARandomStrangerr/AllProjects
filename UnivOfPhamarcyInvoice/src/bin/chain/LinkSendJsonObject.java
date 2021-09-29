@@ -37,6 +37,7 @@ public final class LinkSendJsonObject extends Link {
         BufferedReader br;
         Gson gson;
         String accessToken;
+        StringBuilder displayMessage;
         int iterationNumber;
         try {
             sendObjectsCollection = (List<JsonObject>) chain.getProcessObject();
@@ -49,6 +50,7 @@ public final class LinkSendJsonObject extends Link {
         jsonObj = new JsonObject();
         jsonObj.addProperty("username", (String) PaneAbstract.getProperty("username"));
         jsonObj.addProperty("password", (String) PaneAbstract.getProperty("password"));
+
         try {
             con = (HttpURLConnection) new URL(Address.ADDRESS_AUTH.value + API.ACCESS_TOKEN.value).openConnection();
             con.setRequestMethod("POST");
@@ -74,52 +76,66 @@ public final class LinkSendJsonObject extends Link {
         try {
             TextFile.getInstance().write("debug.txt", false, address);
             TextFile.getInstance().write("debug.txt", true, accessToken);
-        }catch (IOException e){}
+        } catch (IOException e) {
+        }
         //send object
         responseObjectsCollection = new LinkedList<>();
         iterationNumber = 1;
-        try {
-            for (JsonObject jsonObject : sendObjectsCollection) {
+        displayMessage = new StringBuilder();
+        for (JsonObject jsonObject : sendObjectsCollection) {
+            try {
                 con = (HttpURLConnection) new URL(address).openConnection();
                 con.setRequestMethod("POST");
-                con.setRequestProperty("Content-Type", "application/json");
-                con.setRequestProperty("Cookie", accessToken);
-                con.setDoOutput(true);
-                con.setUseCaches(false);
+            } catch (IOException e) {
+                if (displayMessage.length() != 0) displayMessage.append('\n');
+                displayMessage.append("Dòng số " + iterationNumber + " - không kết nối được đến máy chủ Viettel");
+                continue;
+            }
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Cookie", accessToken);
+            con.setDoOutput(true);
+            con.setUseCaches(false);
 
+            try {
                 bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
                 bw.write(jsonObject.toString());
                 bw.newLine();
                 bw.flush();
-                br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String input = br.readLine();
-                jsonObj = gson.fromJson(input, JsonObject.class);
-                try {
-                    if (!jsonObj.get("description").getAsString().isEmpty()) {
-                        chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
-                        chain.setProcessObject(responseObjectsCollection);
-                        return false;
-                    }
-                } catch (UnsupportedOperationException e) {
-                    if (!jsonObj.get("description").isJsonNull()) {
-                        chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
-                        chain.setProcessObject(responseObjectsCollection);
-                        return false;
-                    }
-                }
+            } catch (IOException e) {
+                if (displayMessage.length() != 0) displayMessage.append('\n');
+                displayMessage.append("Dòng số " + iterationNumber + " - không kết nối được đến máy chủ Viettel");
+                continue;
+            }
 
+            String input;
+            try {
+                br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                jsonObj = gson.fromJson(br.readLine(), JsonObject.class);
                 responseObjectsCollection.add(jsonObj);
+            } catch (IOException e) {
+                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                try {
+                    jsonObj = gson.fromJson(br.readLine(), JsonObject.class);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                if (displayMessage.length() != 0) displayMessage.append('\n');
+                displayMessage.append("Dòng số " + iterationNumber + " - " + jsonObj.get("data").getAsString());
+            }
+
+            try {
                 br.close();
                 bw.close();
-                con.disconnect();
-                int finalIterationNumber = iterationNumber;
-                Platform.runLater(() -> BlockMessagePane.getInstance().setMsg(String.format("Thành công\n%d / %d", finalIterationNumber, sendObjectsCollection.size())));
-                iterationNumber++;
+            } catch (IOException ignore) {
             }
-        } catch (IOException e) {
-            chain.setErrorMessage(e.getMessage());
-            e.printStackTrace();
-            return false;
+            con.disconnect();
+
+            int finalIterationNumber = iterationNumber;
+            Platform.runLater(() -> BlockMessagePane.getInstance().setMsg(String.format("Thành công\n%d / %d", finalIterationNumber, sendObjectsCollection.size())));
+            iterationNumber++;
+        }
+        if (displayMessage.length() != 0) {
+            chain.setErrorMessage(displayMessage.toString());
         }
         chain.setProcessObject(responseObjectsCollection);
         return true;
