@@ -1,17 +1,21 @@
 package user_interface.command;
 
-import bin.ExcelOperation;
+import file_operation.ExcelFile;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import user_interface.table_datatype.ReceiverList;
 
 import java.io.IOException;
+import java.util.List;
 
 public class OpenAndReadReceiverExcelFile implements Command {
     private ObservableList<ReceiverList> list;
+    private final Stage ownerStage;
 
-    public OpenAndReadReceiverExcelFile(ObservableList<ReceiverList> list) {
+    public OpenAndReadReceiverExcelFile(Stage ownerStage,
+                                        ObservableList<ReceiverList> list) {
+        this.ownerStage = ownerStage;
         this.list = list;
     }
 
@@ -19,12 +23,11 @@ public class OpenAndReadReceiverExcelFile implements Command {
     public void execute() {
         FileChooser fileChooser = new FileChooser();
         try {
-            for (String line : new ExcelOperation().read(fileChooser.showOpenDialog(new Stage()).getAbsolutePath())) {
-                String[] data = line.split(":");
-                list.add(new ReceiverList(data[0].trim(), data[1].trim(), data[2].trim()));
-            }
+            for (List<String> line : ExcelFile.getInstance().read(fileChooser.showOpenDialog(ownerStage).getAbsolutePath()))
+                list.add(new ReceiverList(line.get(0).trim(), line.get(1).trim(), line.get(2).trim()));
         } catch (IOException e) {
-            System.out.print("File Not Found");
+            System.err.println("Cannot read the excel file");
+            
         }
     }
 }

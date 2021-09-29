@@ -7,7 +7,7 @@ public class SendMailSocket extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         new StartingSequence(stage).execute();
     }
 }
