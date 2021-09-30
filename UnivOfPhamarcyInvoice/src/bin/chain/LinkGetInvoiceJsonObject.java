@@ -24,9 +24,23 @@ public class LinkGetInvoiceJsonObject extends Link {
     public boolean handle() {
         List<JsonObject> sendObject;
         JsonObject jsonObj;
+        int startNumInt,
+                endNumInt;
         sendObject = new LinkedList<>();
-        int endNumInt = Integer.parseInt(endNum);
-        int startNumInt = Integer.parseInt(startNum);
+        try {
+            endNumInt = Integer.parseInt(endNum);
+        }catch (NumberFormatException e){
+            chain.setErrorMessage("Số hóa đơn kết thúc chưa được điền");
+            e.printStackTrace();
+            return false;
+        }
+        try {
+            startNumInt = Integer.parseInt(startNum);
+        }catch (NumberFormatException e){
+            chain.setErrorMessage("Số hóa đơn bắt đầu chưa được điền");
+            e.printStackTrace();
+            return false;
+        }
         for( int index = startNumInt; index <= endNumInt ; index ++){
             jsonObj = new JsonObject();
             jsonObj.addProperty("supplierTaxCode",(String) PaneAbstract.getProperty("username"));
