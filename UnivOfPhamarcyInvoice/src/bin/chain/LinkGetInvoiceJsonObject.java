@@ -41,11 +41,28 @@ public class LinkGetInvoiceJsonObject extends Link {
             e.printStackTrace();
             return false;
         }
+        if (((String) PaneAbstract.getProperty("username")).trim().isEmpty()){
+            chain.setErrorMessage("Tên đăng nhập chưa được điền");
+            return false;
+        }
+        if (((String) PaneAbstract.getProperty("invoiceSeries")).trim().isEmpty()){
+            chain.setErrorMessage("Mã loại hóa đơn chưa được chọn");
+            return false;
+        }
+        if (((String) PaneAbstract.getProperty("invoiceType")).trim().isEmpty()){
+            chain.setErrorMessage("Ký hiệu hóa đơn chưa được điền");
+            return false;
+        }
         for( int index = startNumInt; index <= endNumInt ; index ++){
             jsonObj = new JsonObject();
-            jsonObj.addProperty("supplierTaxCode",(String) PaneAbstract.getProperty("username"));
+            jsonObj.addProperty("supplierTaxCode", (String) PaneAbstract.getProperty("username"));
             jsonObj.addProperty("invoiceNo", String.format("%s%07d", PaneAbstract.getProperty("invoiceSeries"), index));
-            jsonObj.addProperty("templateCode", String.format("%s0/%03d", PaneAbstract.getProperty("invoiceType"), Integer.parseInt((String) PaneAbstract.getProperty("templateCode"))));
+            try {
+                jsonObj.addProperty("templateCode", String.format("%s0/%03d", PaneAbstract.getProperty("invoiceType"), Integer.parseInt((String) PaneAbstract.getProperty("templateCode"))));
+            } catch (NumberFormatException e){
+                chain.setErrorMessage("Số kí hiệu mẫu hóa đơn không hợp lệ hoặc bị bỏ trống");
+                return false;
+            }
             jsonObj.addProperty("fileType", "PDF");
             sendObject.add(jsonObj);
         }
