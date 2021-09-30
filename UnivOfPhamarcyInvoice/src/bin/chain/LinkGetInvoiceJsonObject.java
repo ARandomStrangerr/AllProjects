@@ -53,6 +53,9 @@ public class LinkGetInvoiceJsonObject extends Link {
             chain.setErrorMessage("Ký hiệu hóa đơn chưa được điền");
             return false;
         }
+        if( ((String) PaneAbstract.getProperty("saveFolder")).trim().isEmpty()){
+            chain.setErrorMessage("Thư mục chứa hóa đơn tải về bị bỏ trống");
+        }
         for( int index = startNumInt; index <= endNumInt ; index ++){
             jsonObj = new JsonObject();
             jsonObj.addProperty("supplierTaxCode", (String) PaneAbstract.getProperty("username"));
