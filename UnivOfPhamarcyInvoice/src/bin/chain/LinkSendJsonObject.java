@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import user_interface.BlockMessagePane;
 import user_interface.PaneAbstract;
 
+import javax.net.ssl.SSLException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -37,7 +38,6 @@ public final class LinkSendJsonObject extends Link {
         BufferedReader br;
         Gson gson;
         String accessToken;
-        StringBuilder displayMessage;
         int iterationNumber;
         try {
             sendObjectsCollection = (List<JsonObject>) chain.getProcessObject();
@@ -50,7 +50,6 @@ public final class LinkSendJsonObject extends Link {
         jsonObj = new JsonObject();
         jsonObj.addProperty("username", (String) PaneAbstract.getProperty("username"));
         jsonObj.addProperty("password", (String) PaneAbstract.getProperty("password"));
-
         try {
             con = (HttpURLConnection) new URL(Address.ADDRESS_AUTH.value + API.ACCESS_TOKEN.value).openConnection();
             con.setRequestMethod("POST");
@@ -67,8 +66,12 @@ public final class LinkSendJsonObject extends Link {
             bw.close();
             br.close();
             con.disconnect();
-        } catch (IOException e) {
-            chain.setErrorMessage("Không thể thiết lập kết nối tới Internet");
+        } catch (SSLException e) {
+            chain.setErrorMessage("Không thể thiết lập kết nối tới máy chủ Viettel, vui lòng thử lại");
+            e.printStackTrace();
+            return false;
+        } catch (IOException e){
+            chain.setErrorMessage("Tên đăng nhập hoặc mật khẩu không chính xác");
             e.printStackTrace();
             return false;
         }
@@ -81,61 +84,57 @@ public final class LinkSendJsonObject extends Link {
         //send object
         responseObjectsCollection = new LinkedList<>();
         iterationNumber = 1;
-        displayMessage = new StringBuilder();
-        for (JsonObject jsonObject : sendObjectsCollection) {
-            try {
+        try {
+            for (JsonObject jsonObject : sendObjectsCollection) {
                 con = (HttpURLConnection) new URL(address).openConnection();
                 con.setRequestMethod("POST");
-            } catch (IOException e) {
-                if (displayMessage.length() != 0) displayMessage.append('\n');
-                displayMessage.append("Dòng số " + iterationNumber + " - không kết nối được đến máy chủ Viettel");
-                continue;
-            }
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setRequestProperty("Cookie", accessToken);
-            con.setDoOutput(true);
-            con.setUseCaches(false);
+                con.setRequestProperty("Content-Type", "application/json");
+                con.setRequestProperty("Accept", "application/json");
+                con.setRequestProperty("Cookie", accessToken);
+                con.setDoOutput(true);
+                con.setUseCaches(false);
 
-            try {
                 bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
                 bw.write(jsonObject.toString());
                 bw.newLine();
                 bw.flush();
-            } catch (IOException e) {
-                if (displayMessage.length() != 0) displayMessage.append('\n');
-                displayMessage.append("Dòng số " + iterationNumber + " - không kết nối được đến máy chủ Viettel");
-                continue;
-            }
-
-            String input;
-            try {
                 br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                jsonObj = gson.fromJson(br.readLine(), JsonObject.class);
-                responseObjectsCollection.add(jsonObj);
-            } catch (IOException e) {
-                br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                String input = br.readLine();
+                jsonObj = gson.fromJson(input, JsonObject.class);
                 try {
-                    jsonObj = gson.fromJson(br.readLine(), JsonObject.class);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                    if (!jsonObj.get("description").getAsString().isEmpty()) {
+                        chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
+                        chain.setProcessObject(responseObjectsCollection);
+                        return false;
+                    }
+                } catch (UnsupportedOperationException e) {
+                    if (!jsonObj.get("description").isJsonNull()) {
+                        chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
+                        chain.setProcessObject(responseObjectsCollection);
+                        return false;
+                    }
                 }
-                if (displayMessage.length() != 0) displayMessage.append('\n');
-                displayMessage.append("Dòng số " + iterationNumber + " - " + jsonObj.get("data").getAsString());
-            }
 
-            try {
+                responseObjectsCollection.add(jsonObj);
                 br.close();
                 bw.close();
-            } catch (IOException ignore) {
+                con.disconnect();
+                int finalIterationNumber = iterationNumber;
+                Platform.runLater(() -> BlockMessagePane.getInstance().setMsg(String.format("Thành công\n%d / %d", finalIterationNumber, sendObjectsCollection.size())));
+                iterationNumber++;
             }
-            con.disconnect();
-
-            int finalIterationNumber = iterationNumber;
-            Platform.runLater(() -> BlockMessagePane.getInstance().setMsg(String.format("Thành công\n%d / %d", finalIterationNumber, sendObjectsCollection.size())));
-            iterationNumber++;
-        }
-        if (displayMessage.length() != 0) {
-            chain.setErrorMessage(displayMessage.toString());
+        } catch (IOException e) {
+            br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+            try {
+                System.out.println(br.readLine());
+            } catch (IOException e1) {
+                chain.setErrorMessage(e1.getMessage());
+                e1.printStackTrace();
+                return false;
+            }
+            chain.setErrorMessage(e.getMessage());
+            e.printStackTrace();
+            return false;
         }
         chain.setProcessObject(responseObjectsCollection);
         return true;
