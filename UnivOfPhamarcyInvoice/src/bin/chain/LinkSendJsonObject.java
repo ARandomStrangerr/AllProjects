@@ -120,13 +120,12 @@ public final class LinkSendJsonObject extends Link {
         } catch (IOException e) {
             br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
             try {
-                System.out.println(br.readLine());
+                chain.setErrorMessage(br.readLine());
             } catch (IOException e1) {
                 chain.setErrorMessage(e1.getMessage());
                 e1.printStackTrace();
                 return false;
             }
-            chain.setErrorMessage(e.getMessage());
             e.printStackTrace();
             return false;
         }

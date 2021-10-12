@@ -1,5 +1,5 @@
 package bin;
 
-public user_interface Command {
+public interface Command {
     void execute();
 }
