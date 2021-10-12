@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import user_interface.BlockMessagePane;
 import user_interface.PaneAbstract;
 
+import javax.net.ssl.SSLException;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -65,8 +66,12 @@ public final class LinkSendJsonObject extends Link {
             bw.close();
             br.close();
             con.disconnect();
-        } catch (IOException e) {
-            chain.setErrorMessage("Không thể thiết lập kết nối tới Internet");
+        } catch (SSLException e) {
+            chain.setErrorMessage("Không thể thiết lập kết nối tới máy chủ Viettel, vui lòng thử lại");
+            e.printStackTrace();
+            return false;
+        } catch (IOException e){
+            chain.setErrorMessage("Tên đăng nhập hoặc mật khẩu không chính xác");
             e.printStackTrace();
             return false;
         }
@@ -84,6 +89,7 @@ public final class LinkSendJsonObject extends Link {
                 con = (HttpURLConnection) new URL(address).openConnection();
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json");
+                con.setRequestProperty("Accept", "application/json");
                 con.setRequestProperty("Cookie", accessToken);
                 con.setDoOutput(true);
                 con.setUseCaches(false);
