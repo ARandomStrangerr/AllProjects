@@ -1,9 +1,8 @@
 package ui;
 
-import bin.command.AddFromExcelToTable;
-import bin.command.AddSingleInstanceToTable;
-import bin.command.OpenFileChooser;
-import bin.command.RemoveEntryFromTable;
+import bin.command.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -97,12 +96,64 @@ public final class MainPane extends PaneAbstract {
         settingGrid.add(numberOfStampPerLineLabel, 2, 1);
         settingGrid.add(numberOfStampPerLineTextField, 3, 1);
 
+        stampWidthTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*"))
+                stampWidthTextField.setText(newValue.replaceAll("[^\\d]", ""));
+        });
+        stampHeightTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*"))
+                stampHeightTextField.setText(newValue.replaceAll("[^\\d]", ""));
+        });
+        marginWidthTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*"))
+                marginWidthTextField.setText(newValue.replaceAll("[^\\d]", ""));
+        });
+        numberOfStampPerLineTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    numberOfStampPerLineTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+
         deleteButton.setOnAction(event -> new RemoveEntryFromTable(table).execute());
         addSingleInstance.setOnAction(event -> new AddSingleInstanceToTable(table).execute());
         addFromExcel.setOnAction(event -> {
             OpenFileChooser fileChooser = new OpenFileChooser(this.getWindow());
             fileChooser.execute();
             new AddFromExcelToTable(table, fileChooser.getPath());
+        });
+        printButton.setOnAction(event -> {
+            if (stampWidthTextField.getText().isEmpty()) {
+                MsgPane.getInstance().setDisplayMsgLabel("Độ rọng của tem không được bỏ trống");
+                new OpenPaneMessage(MsgPane.getInstance(),
+                        MessagePaneConcrete.getInstance(),
+                        getWindow());
+                return;
+            }
+            if (stampHeightTextField.getText().isEmpty()) {
+                MsgPane.getInstance().setDisplayMsgLabel("Độ cao của tem không được bỏ trống");
+                new OpenPaneMessage(MsgPane.getInstance(),
+                        MessagePaneConcrete.getInstance(),
+                        getWindow());
+                return;
+            }
+            if (marginWidthTextField.getText().isEmpty()) {
+                MsgPane.getInstance().setDisplayMsgLabel("Độ dầy của lề không được bỏ trống");
+                new OpenPaneMessage(MsgPane.getInstance(),
+                        MessagePaneConcrete.getInstance(),
+                        getWindow());
+                return;
+            }
+            if (numberOfStampPerLineTextField.getText().isEmpty()) {
+                MsgPane.getInstance().setDisplayMsgLabel("Số tem ở trên một hàng không được bỏ trống");
+                new OpenPaneMessage(MsgPane.getInstance(),
+                        MessagePaneConcrete.getInstance(),
+                        getWindow());
+                return;
+            }
         });
 
         addMenuButton.getItems().addAll(addSingleInstance,

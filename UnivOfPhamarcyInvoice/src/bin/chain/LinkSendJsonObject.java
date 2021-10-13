@@ -86,6 +86,8 @@ public final class LinkSendJsonObject extends Link {
         iterationNumber = 1;
         try {
             for (JsonObject jsonObject : sendObjectsCollection) {
+                System.out.println(jsonObject);
+
                 con = (HttpURLConnection) new URL(address).openConnection();
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json");
@@ -126,7 +128,7 @@ public final class LinkSendJsonObject extends Link {
         } catch (IOException e) {
             br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
             try {
-                chain.setErrorMessage(br.readLine());
+                chain.setErrorMessage(br.readLine() +  "\n" + "ở số " + iterationNumber);
             } catch (IOException e1) {
                 chain.setErrorMessage(e1.getMessage());
                 e1.printStackTrace();
