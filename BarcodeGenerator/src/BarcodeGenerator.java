@@ -1,6 +1,7 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import ui.MainPane;
 import user_interface.MainMenu;
 
 public class BarcodeGenerator extends Application {
@@ -9,7 +10,9 @@ public class BarcodeGenerator extends Application {
     }
 
     public void start(Stage stage){
-        stage.setScene(new Scene(new MainMenu(stage).getPrimePane()));
+        Scene scene = new Scene(MainPane.getInstance().getMainPane());
+        scene.getStylesheets().add("ui/stylesheet/stylesheet.css");
+        stage.setScene(scene);
         stage.setTitle("Công ty Điện - Điện tử Tin học EIE");
         stage.show();
     }
