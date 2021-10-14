@@ -19,6 +19,7 @@ public class MsgPane extends PaneAbstract {
         super(new VBox());
         mainPane = (VBox) super.getMainPane();
         displayMsgLabel = new Label();
+        setup();
     }
 
     @Override
