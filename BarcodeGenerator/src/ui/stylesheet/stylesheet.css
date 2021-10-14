@@ -5,6 +5,14 @@
     -fx-hgap: 5px;
     -fx-vgap: 5px;
 }
+.spacing{
+    -fx-spacing: 5px;
+}
 .button{
-    .fx-padding: 5px 10px 5px 10px;
+    -fx-padding: 5px 10px 5px 10px;
+}
+
+.backgroundBlack{
+    -fx-background-color: black;
+
 }

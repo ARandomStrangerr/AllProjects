@@ -1,6 +1,7 @@
 package bin.command;
 
 import bin.barcode.BarcodeGenerator;
+import bin.barcode.Code128;
 import bin.barcode.EAN13;
 import command.CommandInterface;
 import javafx.application.Platform;
@@ -9,6 +10,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -43,7 +45,7 @@ public class Print implements CommandInterface {
         printPage = new VBox();
 
         //update more type of barcode
-        generator = new EAN13();
+        generator = new Code128();
 
         for (BarcodeInstance printInstance : printInstances) {
             if (currentStampOnPaper == maxStampPerPaper) {
@@ -58,7 +60,7 @@ public class Print implements CommandInterface {
             }
 
             stamp = new HBox();
-            stamp.setStyle(String.format("-fx-padding:%fcm;-fx-pref-width=%fcm;-fx-pref-height:%fcm",
+            stamp.setStyle(String.format("-fx-padding:%fcm;-fx-max-width:%fcm;-fx-max-height:%fcm;-fx-alignment:center",
                     paperMargin,
                     paperWidth / 3,
                     paperHeight));
@@ -67,8 +69,10 @@ public class Print implements CommandInterface {
                         null);
                 ImageView imageView = new ImageView(image);
                 stamp.getChildren().add(imageView);
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            printPage.getChildren().add(stamp);
             currentStampOnPaper++;
         }
 
@@ -77,6 +81,7 @@ public class Print implements CommandInterface {
         Platform.runLater(() -> {
             for (Pane page : printPages) {
                 Scene scene = new Scene(page);
+                scene.getStylesheets().add("ui/stylesheet/stylesheet.css");
                 Stage stage = new Stage();
                 stage.setScene(scene);
                 stage.show();

@@ -1,8 +1,6 @@
 package ui;
 
 import bin.command.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -186,8 +184,10 @@ public final class MainPane extends PaneAbstract {
                 settingGrid,
                 printButtonWrapper);
 
-        mainPane.getStyleClass().add("body");
+        mainPane.getStyleClass().addAll("body", "spacing");
         settingGrid.getStyleClass().add("grid");
+        labelAndButtonForTableWrapper.getStyleClass().add("spacing");
+        deleteButton.getStyleClass().add("button");
     }
 
     public TableView<BarcodeInstance> getTable() {
