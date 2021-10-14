@@ -3,16 +3,22 @@ package bin.command;
 import bin.barcode.BarcodeGenerator;
 import bin.barcode.Code128;
 import bin.barcode.EAN13;
+import com.sun.javafx.print.PrintHelper;
+import com.sun.javafx.print.Units;
 import command.CommandInterface;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.print.PageLayout;
+import javafx.print.PageOrientation;
+import javafx.print.Paper;
+import javafx.print.PrinterJob;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ui.MainPane;
@@ -25,8 +31,8 @@ public class Print implements CommandInterface {
     @Override
     public void execute() {
         List<Pane> printPages;
-        VBox printPage;
-        HBox stamp;
+        HBox printPage;
+        StackPane stamp;
         ObservableList<BarcodeInstance> printInstances;
         float paperWidth,
                 paperHeight,
@@ -42,7 +48,7 @@ public class Print implements CommandInterface {
         maxStampPerPaper = Integer.parseInt((String) MainPane.getProperty("numberOfStamp"));
         currentStampOnPaper = 0;
         printPages = new LinkedList<>();
-        printPage = new VBox();
+        printPage = new HBox();
 
         //update more type of barcode
         generator = new Code128();
@@ -51,19 +57,31 @@ public class Print implements CommandInterface {
             if (currentStampOnPaper == maxStampPerPaper) {
                 currentStampOnPaper = 0;
                 printPages.add(printPage);
-                printPage = new VBox();
+                printPage = new HBox();
             }
-            if (currentStampOnPaper == 0) {
-                printPage.setStyle(String.format("-fx-pref-width:%fcm;-fx-pref-height:%fcm;",
+            if (currentStampOnPaper == 0)
+                printPage.setStyle(String.format("-fx-max-width:%fcm;" +
+                                "-fx-min-width:%fcm;" +
+                                "-fx-max-height:%fcm;" +
+                                "-fx-min-height:%fcm;",
                         paperWidth,
+                        paperWidth,
+                        paperHeight,
                         paperHeight));
-            }
 
-            stamp = new HBox();
-            stamp.setStyle(String.format("-fx-padding:%fcm;-fx-max-width:%fcm;-fx-max-height:%fcm;-fx-alignment:center",
+            stamp = new StackPane();
+            stamp.setStyle(String.format("-fx-padding:%fcm;" +
+                            "-fx-max-width:%fcm;" +
+                            "-fx-min-width:%fcm;" +
+                            "-fx-max-height:%fcm;" +
+                            "-fx-min-height:%fcm;" +
+                            "-fx-alignment:center",
                     paperMargin,
-                    paperWidth / 3,
+                    paperWidth / maxStampPerPaper,
+                    paperWidth / maxStampPerPaper,
+                    paperHeight,
                     paperHeight));
+            stamp.getStyleClass().add("temp");
             try {
                 Image image = SwingFXUtils.toFXImage(generator.generate(printInstance.getCode()),
                         null);
@@ -78,19 +96,22 @@ public class Print implements CommandInterface {
 
         printPages.add(printPage);
 
-        Platform.runLater(() -> {
-            for (Pane page : printPages) {
-                Scene scene = new Scene(page);
-                scene.getStylesheets().add("ui/stylesheet/stylesheet.css");
-                Stage stage = new Stage();
-                stage.setScene(scene);
-                stage.show();
+//        Platform.runLater(() -> {
+//            for (Pane page : printPages) {
+//                Scene scene = new Scene(page);
+//                scene.getStylesheets().add("ui/stylesheet/stylesheet.css");
+//                Stage stage = new Stage();
+//                stage.setScene(scene);
+//                stage.show();
+//            }
+//        });
+        for (Pane root : printPages) {
+            PrinterJob printerJob = PrinterJob.createPrinterJob();
+            Paper photo = PrintHelper.createPaper("10x15", paperWidth * 10, paperHeight * 10, Units.MM);
+            if (printerJob != null) {
+                PageLayout pageLayout = printerJob.getPrinter().createPageLayout(photo, PageOrientation.LANDSCAPE, 0, 0, 0, 0);
+                printerJob.printPage(pageLayout, root);
             }
-        });
-
-//        PrinterJob printerJob = PrinterJob.createPrinterJob();
-//        if (printerJob != null) {
-//            PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.A0);
-//        }
+        }
     }
 }
