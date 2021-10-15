@@ -1,5 +1,11 @@
 import javafx.application.Application;
+import javafx.print.PageLayout;
+import javafx.print.PageOrientation;
+import javafx.print.Paper;
+import javafx.print.PrinterJob;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ui.MainPane;
 import user_interface.windows.WindowRegular;

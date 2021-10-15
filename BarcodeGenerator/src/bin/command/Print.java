@@ -6,13 +6,16 @@ import bin.barcode.EAN13;
 import com.sun.javafx.print.PrintHelper;
 import com.sun.javafx.print.Units;
 import command.CommandInterface;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Pos;
 import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
 import javafx.print.Paper;
 import javafx.print.PrinterJob;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -31,19 +34,21 @@ public class Print implements CommandInterface {
     public void execute() {
         List<Pane> printPages;
         HBox printPage;
-        StackPane stamp;
+        VBox stamp;
         ObservableList<BarcodeInstance> printInstances;
-        float paperWidth,
-                paperHeight,
-                paperMargin;
+        float stampWidth,
+                stampHeight,
+                paperWidth,
+                paperHeight;
         int maxStampPerPaper,
                 currentStampOnPaper;
         BarcodeGenerator generator;
 
         printInstances = MainPane.getInstance().getTable().getItems();
-        paperWidth = Float.parseFloat((String) MainPane.getProperty("stampWidth"));
-        paperHeight = Float.parseFloat((String) MainPane.getProperty("stampHeight"));
-        paperMargin = Float.parseFloat((String) MainPane.getProperty("marginWidth"));
+        stampWidth = Float.parseFloat((String) MainPane.getProperty("stampWidth"));
+        stampHeight = Float.parseFloat((String) MainPane.getProperty("stampHeight"));
+        paperWidth = Float.parseFloat((String) MainPane.getProperty("paperWidth"));
+        paperHeight = Float.parseFloat((String) MainPane.getProperty("paperHeight"));
         maxStampPerPaper = Integer.parseInt((String) MainPane.getProperty("numberOfStamp"));
         currentStampOnPaper = 0;
         printPages = new LinkedList<>();
@@ -58,34 +63,27 @@ public class Print implements CommandInterface {
                 printPages.add(printPage);
                 printPage = new HBox();
             }
-            if (currentStampOnPaper == 0)
-                printPage.setStyle(String.format("-fx-max-width:%fmm;" +
-                                "-fx-min-width:%fmm;" +
-                                "-fx-max-height:%fmm;" +
-                                "-fx-min-height:%fmm;",
-                        paperWidth,
-                        paperWidth,
-                        paperHeight,
-                        paperHeight));
 
-            stamp = new StackPane();
-            stamp.setStyle(String.format("-fx-padding:%fmm;" +
-                            "-fx-max-width:%fmm;" +
-                            "-fx-min-width:%fmm;" +
-                            "-fx-max-height:%fmm;" +
-                            "-fx-min-height:%fmm;" +
-                            "-fx-alignment:center",
-                    paperMargin,
-                    paperWidth / maxStampPerPaper,
-                    paperWidth / maxStampPerPaper,
-                    paperHeight,
-                    paperHeight));
-            stamp.getStyleClass().add("temp");
+//            printPage.setStyle(String.format("-fx-max-width:%fmm;" +
+//                    "-fx-min-width:%fmm;" +
+//                    "-fx-max-height:%fmm;" +
+//                    "-fx-min-height:%fmm",
+//                    paperWidth,
+//                    paperWidth,
+//                    paperHeight,
+//                    paperHeight));
+
+            stamp = new VBox();
+//            stamp.setAlignment(Pos.CENTER);
             try {
                 Image image = SwingFXUtils.toFXImage(generator.generate(printInstance.getCode()),
                         null);
                 ImageView imageView = new ImageView(image);
+                imageView.setFitWidth(stampWidth);
+                imageView.setFitHeight(stampHeight);
+                imageView.setPreserveRatio(false);
                 stamp.getChildren().add(imageView);
+//                stamp.getChildren().add(new Label(printInstance.getLabel()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -94,22 +92,26 @@ public class Print implements CommandInterface {
         }
 
         printPages.add(printPage);
-
 //        Platform.runLater(() -> {
-//            for (Pane page : printPages) {
-//                Scene scene = new Scene(page);
-//                scene.getStylesheets().add("ui/stylesheet/stylesheet.css");
+//            for (Pane displayPage : printPages) {
 //                Stage stage = new Stage();
-//                stage.setScene(scene);
+//                stage.setScene(new Scene(displayPage));
 //                stage.show();
 //            }
 //        });
-        for (Pane root : printPages) {
-            PrinterJob printerJob = PrinterJob.createPrinterJob();
-            Paper photo = PrintHelper.createPaper("custom", paperWidth, paperHeight, Units.MM);
-            if (printerJob != null) {
-                PageLayout pageLayout = printerJob.getPrinter().createPageLayout(photo, PageOrientation.LANDSCAPE, 0, 0, 0, 0);
-                printerJob.printPage(pageLayout, root);
+        Paper photo = PrintHelper.createPaper("custom", paperWidth, paperHeight, Units.MM);
+        PrinterJob printerJob = PrinterJob.createPrinterJob();
+        PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.A4,
+                PageOrientation.PORTRAIT,
+                0,
+                0,
+                0,
+                0);
+        if (printerJob.showPrintDialog(MainPane.getInstance().getWindow().getCurrentStage())) {
+            for (Pane page : printPages) {
+                if (printerJob.printPage(pageLayout, page)) {
+                    printerJob.endJob();
+                }
             }
         }
     }
