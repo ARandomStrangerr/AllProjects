@@ -6,7 +6,6 @@ import bin.barcode.EAN13;
 import com.sun.javafx.print.PrintHelper;
 import com.sun.javafx.print.Units;
 import command.CommandInterface;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.print.PageLayout;
@@ -60,21 +59,21 @@ public class Print implements CommandInterface {
                 printPage = new HBox();
             }
             if (currentStampOnPaper == 0)
-                printPage.setStyle(String.format("-fx-max-width:%fcm;" +
-                                "-fx-min-width:%fcm;" +
-                                "-fx-max-height:%fcm;" +
-                                "-fx-min-height:%fcm;",
+                printPage.setStyle(String.format("-fx-max-width:%fmm;" +
+                                "-fx-min-width:%fmm;" +
+                                "-fx-max-height:%fmm;" +
+                                "-fx-min-height:%fmm;",
                         paperWidth,
                         paperWidth,
                         paperHeight,
                         paperHeight));
 
             stamp = new StackPane();
-            stamp.setStyle(String.format("-fx-padding:%fcm;" +
-                            "-fx-max-width:%fcm;" +
-                            "-fx-min-width:%fcm;" +
-                            "-fx-max-height:%fcm;" +
-                            "-fx-min-height:%fcm;" +
+            stamp.setStyle(String.format("-fx-padding:%fmm;" +
+                            "-fx-max-width:%fmm;" +
+                            "-fx-min-width:%fmm;" +
+                            "-fx-max-height:%fmm;" +
+                            "-fx-min-height:%fmm;" +
                             "-fx-alignment:center",
                     paperMargin,
                     paperWidth / maxStampPerPaper,
@@ -107,7 +106,7 @@ public class Print implements CommandInterface {
 //        });
         for (Pane root : printPages) {
             PrinterJob printerJob = PrinterJob.createPrinterJob();
-            Paper photo = PrintHelper.createPaper("10x15", paperWidth * 10, paperHeight * 10, Units.MM);
+            Paper photo = PrintHelper.createPaper("custom", paperWidth, paperHeight, Units.MM);
             if (printerJob != null) {
                 PageLayout pageLayout = printerJob.getPrinter().createPageLayout(photo, PageOrientation.LANDSCAPE, 0, 0, 0, 0);
                 printerJob.printPage(pageLayout, root);
