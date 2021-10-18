@@ -11,6 +11,7 @@ import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
 import javafx.print.Paper;
 import javafx.print.PrinterJob;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -70,7 +71,7 @@ public class Print implements CommandInterface {
                 imageView.setFitHeight(stampHeight);
                 imageView.setPreserveRatio(false);
                 stamp.getChildren().add(imageView);
-//                stamp.getChildren().add(new Label(printInstance.getLabel()));
+                stamp.getChildren().add(new Label(printInstance.getLabel()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -79,7 +80,6 @@ public class Print implements CommandInterface {
         }
 
         printPages.add(printPage);
-        Paper photo = PrintHelper.createPaper("custom", paperWidth, paperHeight, Units.MM);
         PrinterJob printerJob = PrinterJob.createPrinterJob();
         PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.A4,
                 PageOrientation.PORTRAIT,
