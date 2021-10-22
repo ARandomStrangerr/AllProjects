@@ -2,11 +2,10 @@ package bin.command;
 
 import bin.barcode.BarcodeGenerator;
 import bin.barcode.Code128;
-import com.sun.javafx.print.PrintHelper;
-import com.sun.javafx.print.Units;
 import command.CommandInterface;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Pos;
 import javafx.print.PageLayout;
 import javafx.print.PageOrientation;
 import javafx.print.Paper;
@@ -46,8 +45,8 @@ public class Print implements CommandInterface {
         paperHeight = Float.parseFloat((String) MainPane.getProperty("paperHeight"));
         maxStampPerPaper = Integer.parseInt((String) MainPane.getProperty("numberOfStamp"));
 
-        marginLeft = 150 - 150 / 105 * paperWidth;
-        stampWidth = paperWidth * 300 / 105 / maxStampPerPaper;
+        marginLeft = 150 - 10f / 7f * paperWidth;
+        stampWidth = paperWidth * 20 / 7 / maxStampPerPaper;
 
         currentStampOnPaper = 0;
         printPages = new LinkedList<>();
@@ -71,7 +70,12 @@ public class Print implements CommandInterface {
                 imageView.setFitHeight(stampHeight);
                 imageView.setPreserveRatio(false);
                 stamp.getChildren().add(imageView);
-                stamp.getChildren().add(new Label(printInstance.getLabel()));
+                String[] arr = printInstance.getLabel().split("\\.");
+                for (String str : arr) {
+                    if (!str.isEmpty())
+                        stamp.getChildren().add(new Label(str.trim()));
+                }
+                stamp.setAlignment(Pos.TOP_CENTER);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -87,6 +91,7 @@ public class Print implements CommandInterface {
                 0,
                 0,
                 0);
+
         if (printerJob.showPrintDialog(MainPane.getInstance().getWindow().getCurrentStage())) {
             for (Pane page : printPages) {
                 if (printerJob.printPage(pageLayout, page)) {
