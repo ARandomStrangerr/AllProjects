@@ -4,11 +4,8 @@ import javafx.stage.Stage;
 import ui.MainPane;
 import user_interface.windows.WindowRegular;
 
-import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Enumeration;
 
 public class BarcodeGenerator extends Application {
