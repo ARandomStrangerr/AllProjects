@@ -103,19 +103,6 @@ public final class LinkSendJsonObject extends Link {
                 br = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String input = br.readLine();
                 jsonObj = gson.fromJson(input, JsonObject.class);
-                try {
-                    if (!jsonObj.get("description").getAsString().isEmpty()) {
-                        chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
-                        chain.setProcessObject(responseObjectsCollection);
-                        return false;
-                    }
-                } catch (UnsupportedOperationException e) {
-                    if (!jsonObj.get("description").isJsonNull()) {
-                        chain.setErrorMessage("Lỗi ở bản ghi " + iterationNumber + " - " + jsonObj.get("description").getAsString());
-                        chain.setProcessObject(responseObjectsCollection);
-                        return false;
-                    }
-                }
 
                 responseObjectsCollection.add(jsonObj);
                 br.close();

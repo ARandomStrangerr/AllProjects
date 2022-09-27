@@ -2,19 +2,20 @@ package bin.command;
 
 import bin.barcode.BarcodeGenerator;
 import bin.barcode.Code128;
-import bin.barcode.EAN13;
 import command.CommandInterface;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.Scene;
+import javafx.geometry.Pos;
+import javafx.print.PageLayout;
+import javafx.print.PageOrientation;
+import javafx.print.Paper;
+import javafx.print.PrinterJob;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import ui.MainPane;
 import ui.table_structure.BarcodeInstance;
 
@@ -25,24 +26,31 @@ public class Print implements CommandInterface {
     @Override
     public void execute() {
         List<Pane> printPages;
-        VBox printPage;
-        HBox stamp;
+        HBox printPage;
+        VBox stamp;
         ObservableList<BarcodeInstance> printInstances;
-        float paperWidth,
+        float stampWidth,
+                stampHeight,
+                paperWidth,
                 paperHeight,
-                paperMargin;
+                marginLeft;
         int maxStampPerPaper,
                 currentStampOnPaper;
         BarcodeGenerator generator;
 
         printInstances = MainPane.getInstance().getTable().getItems();
-        paperWidth = Float.parseFloat((String) MainPane.getProperty("stampWidth"));
-        paperHeight = Float.parseFloat((String) MainPane.getProperty("stampHeight"));
-        paperMargin = Float.parseFloat((String) MainPane.getProperty("marginWidth"));
+        stampWidth = Float.parseFloat((String) MainPane.getProperty("stampWidth"));
+        stampHeight = Float.parseFloat((String) MainPane.getProperty("stampHeight"));
+        paperWidth = Float.parseFloat((String) MainPane.getProperty("paperWidth"));
+        paperHeight = Float.parseFloat((String) MainPane.getProperty("paperHeight"));
         maxStampPerPaper = Integer.parseInt((String) MainPane.getProperty("numberOfStamp"));
+
+        marginLeft = 150 - 10f / 7f * paperWidth;
+        stampWidth = paperWidth * 20 / 7 / maxStampPerPaper;
+
         currentStampOnPaper = 0;
         printPages = new LinkedList<>();
-        printPage = new VBox();
+        printPage = new HBox();
 
         //update more type of barcode
         generator = new Code128();
@@ -51,24 +59,23 @@ public class Print implements CommandInterface {
             if (currentStampOnPaper == maxStampPerPaper) {
                 currentStampOnPaper = 0;
                 printPages.add(printPage);
-                printPage = new VBox();
+                printPage = new HBox();
             }
-            if (currentStampOnPaper == 0) {
-                printPage.setStyle(String.format("-fx-pref-width:%fcm;-fx-pref-height:%fcm;",
-                        paperWidth,
-                        paperHeight));
-            }
-
-            stamp = new HBox();
-            stamp.setStyle(String.format("-fx-padding:%fcm;-fx-max-width:%fcm;-fx-max-height:%fcm;-fx-alignment:center",
-                    paperMargin,
-                    paperWidth / 3,
-                    paperHeight));
+            stamp = new VBox();
             try {
                 Image image = SwingFXUtils.toFXImage(generator.generate(printInstance.getCode()),
                         null);
                 ImageView imageView = new ImageView(image);
+                imageView.setFitWidth(stampWidth);
+                imageView.setFitHeight(stampHeight);
+                imageView.setPreserveRatio(false);
                 stamp.getChildren().add(imageView);
+                String[] arr = printInstance.getLabel().split("\\.");
+                for (String str : arr) {
+                    if (!str.isEmpty())
+                        stamp.getChildren().add(new Label(str.trim()));
+                }
+                stamp.setAlignment(Pos.TOP_CENTER);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -77,20 +84,20 @@ public class Print implements CommandInterface {
         }
 
         printPages.add(printPage);
+        PrinterJob printerJob = PrinterJob.createPrinterJob();
+        PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.A4,
+                PageOrientation.PORTRAIT,
+                marginLeft,
+                0,
+                0,
+                0);
 
-        Platform.runLater(() -> {
+        if (printerJob.showPrintDialog(MainPane.getInstance().getWindow().getCurrentStage())) {
             for (Pane page : printPages) {
-                Scene scene = new Scene(page);
-                scene.getStylesheets().add("ui/stylesheet/stylesheet.css");
-                Stage stage = new Stage();
-                stage.setScene(scene);
-                stage.show();
+                if (printerJob.printPage(pageLayout, page)) {
+                    printerJob.endJob();
+                }
             }
-        });
-
-//        PrinterJob printerJob = PrinterJob.createPrinterJob();
-//        if (printerJob != null) {
-//            PageLayout pageLayout = printerJob.getPrinter().createPageLayout(Paper.A0);
-//        }
+        }
     }
 }

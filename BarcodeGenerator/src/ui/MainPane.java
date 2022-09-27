@@ -20,11 +20,13 @@ public final class MainPane extends PaneAbstract {
             paperSetupLabel,
             stampWidthLabel,
             stampHeightLabel,
-            marginWidthLabel,
+            paperWidthLabel,
+            paperHeightLabel,
             numberOfStampPerLineLabel;
     private final TextField stampWidthTextField,
             stampHeightTextField,
-            marginWidthTextField,
+            paperWidthTextField,
+            paperHeightTextField,
             numberOfStampPerLineTextField;
     private final Button deleteButton,
             printButton;
@@ -48,11 +50,13 @@ public final class MainPane extends PaneAbstract {
         paperSetupLabel = new Label("Định dạng khổ giấy in ra");
         stampWidthLabel = new Label("Độ rộng của tem");
         stampHeightLabel = new Label("Độ cao của tem");
-        marginWidthLabel = new Label("Độ rộng của lề");
+        paperWidthLabel = new Label("Độ rộng giấy");
+        paperHeightLabel = new Label("Độ cao giấy");
         numberOfStampPerLineLabel = new Label("Số tem mỗi hàng");
         stampWidthTextField = new TextField();
         stampHeightTextField = new TextField();
-        marginWidthTextField = new TextField();
+        paperWidthTextField = new TextField();
+        paperHeightTextField= new TextField();
         numberOfStampPerLineTextField = new TextField();
 
         deleteButton = new Button("-");
@@ -73,6 +77,8 @@ public final class MainPane extends PaneAbstract {
 
     @Override
     protected void setup() {
+        table.getItems().add(new BarcodeInstance("01257892557", "thu nghiem"));
+
         HBox.setHgrow(labelAndButtonForTableRegion, Priority.ALWAYS);
         HBox.setHgrow(printButtonRegion, Priority.ALWAYS);
 
@@ -82,7 +88,7 @@ public final class MainPane extends PaneAbstract {
         codeCol.setOnEditCommit(event -> table.getSelectionModel().getSelectedItem().setCode(event.getNewValue()));
         labelCol.setCellValueFactory(new PropertyValueFactory<>("label"));
         labelCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        labelCol.setOnEditCommit(event -> table.getSelectionModel().getSelectedItem().setCode(event.getNewValue()));
+        labelCol.setOnEditCommit(event -> table.getSelectionModel().getSelectedItem().setLabel(event.getNewValue()));
         table.getColumns().addAll(codeCol, labelCol);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -90,10 +96,12 @@ public final class MainPane extends PaneAbstract {
         settingGrid.add(stampHeightTextField, 1, 0);
         settingGrid.add(stampWidthLabel, 2, 0);
         settingGrid.add(stampWidthTextField, 3, 0);
-        settingGrid.add(marginWidthLabel, 0, 1);
-        settingGrid.add(marginWidthTextField, 1, 1);
-        settingGrid.add(numberOfStampPerLineLabel, 2, 1);
-        settingGrid.add(numberOfStampPerLineTextField, 3, 1);
+        settingGrid.add(paperHeightLabel, 0, 1);
+        settingGrid.add(paperHeightTextField, 1, 1);
+        settingGrid.add(paperWidthLabel, 2, 1);
+        settingGrid.add(paperWidthTextField, 3, 1);
+        settingGrid.add(numberOfStampPerLineLabel, 0, 2);
+        settingGrid.add(numberOfStampPerLineTextField, 1, 2);
 
         stampWidthTextField.setText((String) getProperty("stampWidth"));
         stampWidthTextField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -105,10 +113,15 @@ public final class MainPane extends PaneAbstract {
             if (!newValue.matches("\\d*"))
                 stampHeightTextField.setText(newValue.replaceAll("[^\\d]", ""));
         });
-        marginWidthTextField.setText((String) getProperty("marginWidth"));
-        marginWidthTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+        paperWidthTextField.setText((String) getProperty("paperWidth"));
+        paperWidthTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*"))
-                marginWidthTextField.setText(newValue.replaceAll("[^\\d]", ""));
+                stampHeightTextField.setText(newValue.replaceAll("[^\\d]", ""));
+        });
+        paperHeightTextField.setText((String) getProperty("paperHeight"));
+        paperHeightTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*"))
+                stampHeightTextField.setText(newValue.replaceAll("[^\\d]", ""));
         });
         numberOfStampPerLineTextField.setText((String) getProperty("numberOfStamp"));
         numberOfStampPerLineTextField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -126,7 +139,7 @@ public final class MainPane extends PaneAbstract {
         });
         printButton.setOnAction(event -> {
             if (stampWidthTextField.getText().isEmpty()) {
-                MsgPane.getInstance().setDisplayMsgLabel("Độ rọng của tem không được bỏ trống");
+                MsgPane.getInstance().setDisplayMsgLabel("Độ rộng của tem không được bỏ trống");
                 new OpenPaneMessage(MsgPane.getInstance(),
                         MessagePaneConcrete.getInstance(),
                         getWindow()).execute();
@@ -139,8 +152,15 @@ public final class MainPane extends PaneAbstract {
                         getWindow()).execute();
                 return;
             }
-            if (marginWidthTextField.getText().isEmpty()) {
-                MsgPane.getInstance().setDisplayMsgLabel("Độ dầy của lề không được bỏ trống");
+            if (paperWidthTextField.getText().isEmpty()) {
+                MsgPane.getInstance().setDisplayMsgLabel("Độ rộng của giấy không được bỏ trống");
+                new OpenPaneMessage(MsgPane.getInstance(),
+                        MessagePaneConcrete.getInstance(),
+                        getWindow()).execute();
+                return;
+            }
+            if (paperHeightTextField.getText().isEmpty()) {
+                MsgPane.getInstance().setDisplayMsgLabel("Độ cao của giấy không được bỏ trống");
                 new OpenPaneMessage(MsgPane.getInstance(),
                         MessagePaneConcrete.getInstance(),
                         getWindow()).execute();
@@ -163,7 +183,8 @@ public final class MainPane extends PaneAbstract {
             new Thread(() -> {
                 setProperty("stampWidth", stampWidthTextField.getText());
                 setProperty("stampHeight", stampHeightTextField.getText());
-                setProperty("marginWidth", marginWidthTextField.getText());
+                setProperty("paperWidth", paperWidthTextField.getText());
+                setProperty("paperHeight", paperHeightTextField.getText());
                 setProperty("numberOfStamp", numberOfStampPerLineTextField.getText());
                 new SaveProperties().execute();
                 new Print().execute();

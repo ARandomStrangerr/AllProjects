@@ -7,7 +7,7 @@ public final class BarcodeInstance {
 
     public BarcodeInstance(String code,
                            String label) {
-        this.code = new SimpleStringProperty( code);
+        this.code = new SimpleStringProperty(code);
         this.label = new SimpleStringProperty(label);
     }
 
