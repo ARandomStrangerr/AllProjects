@@ -1,0 +1,77 @@
+#main-body{
+    -fx-padding: 25px;
+    -fx-background-color: white;
+    -fx-spacing: 10px;
+}
+#setting-pane{
+    -fx-border-width: 5px 0px 0px 0px;
+    -fx-border-color: #fff2b2;
+    -fx-background-color: white;
+}
+#red-message-pane {
+    -fx-border-width: 5px 0px 0px 0px;
+    -fx-border-color: #ffb3c1;
+    -fx-background-color: white;
+}
+#red-message-pane .button {
+    -fx-background-color: #fff0f3;
+}
+#red-message-pane .button:hover{
+    -fx-background-color: #ffb3c1;
+}
+#setting-pane #wrapper{
+    -fx-padding:25px;
+}
+.upper-pane{
+    -fx-hgap:10px;
+    -fx-vgap:5px;
+    -fx-padding:25px;
+    -fx-background-color: #f8f9fa;
+    -fx-spacing: 5px;
+}
+.lower-pane{
+    -fx-padding:25px;
+    -fx-spacing: 5px;
+    -fx-alignment: center-right;
+}
+.menu-button{
+    -fx-font: 16 'monospace';
+}
+.menu-button > .arrow-button {
+    -fx-padding: 0;
+}
+.menu-button > .arrow-button > .arrow {
+    -fx-padding: 0;
+}
+.button{
+    -fx-font: 16 'monospace';
+    -fx-background-color: white;
+}
+.button:hover{
+    -fx-background-color: #c2c5bb;
+}
+#button-red{
+    -fx-background-color: #fff0f3;
+}
+#button-red:hover{
+    -fx-background-color: #ffb3c1;
+}
+#button-green{
+    -fx-background-color: #d8f3dc;
+}
+#button-green:hover{
+    -fx-background-color: #95d5b2;
+}
+.label{
+    -fx-font: 16 'monospace';
+}
+.text-field{
+    -fx-font: 16 'monospace';
+}
+.padding{
+    -fx-padding:25px;
+}
+#wrapper{
+    -fx-spacing: 5px;
+    -fx-alignment: center-right;
+}

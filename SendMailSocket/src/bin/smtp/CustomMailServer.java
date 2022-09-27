@@ -13,7 +13,6 @@ public class CustomMailServer {
     private OutputStream os;
     private BufferedReader is;
     private String from, to;
-
     public CustomMailServer() {
 
     }
