@@ -1,9 +1,6 @@
 package ui;
 
-import bin.command.OpenSettingWindow;
-import bin.command.ReadExcelFile;
-import bin.command.ReadFromLog;
-import bin.command.SendEmail;
+import bin.command.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -11,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 public class PaneMain extends PaneAbstract {
@@ -21,6 +19,7 @@ public class PaneMain extends PaneAbstract {
     @Override
     protected void create() {
         Button btnDelete = new Button("-"),
+                setAttachmentFolderButton = new Button("Chọn"),
                 sendButton = new Button("Gửi thư");
         btnDelete.setId("button-red");
         MenuItem optionAddOne = new MenuItem("add one"),
@@ -47,23 +46,32 @@ public class PaneMain extends PaneAbstract {
         optionAddOne.setOnAction(event -> table.getItems().add(new EmailTableData("Trống", "Trống")));
         table.getColumns().addAll(colEmail, colFile);
         table.setEditable(true);
-        TextField subjectTextField = new TextField();
+        TextField subjectTextField = new TextField(),
+                attachmentFolderTextField = new TextField();
+        attachmentFolderTextField.setEditable(false);
+        setAttachmentFolderButton.setOnAction(event -> {
+            DirectoryChooser dc = new DirectoryChooser();
+            attachmentFolderTextField.setText(dc.showDialog(super.getStage()).getAbsolutePath());
+        });
         Label tableTitle = new Label("Danh sách người nhận"),
                 mailSubjectTitle = new Label("Tiêu đề"),
-                messageTitle = new Label("Nội dung thư");
+                messageTitle = new Label("Nội dung thư"),
+                attachmentFolderTitle = new Label("Thư mục chứa tệp tin đính kèm");
         TextArea mailBodyTextArea = new TextArea();
         Region tableControlPaddingLeft = new Region(),
                 sendPaddingLeft = new Region();
         HBox.setHgrow(tableControlPaddingLeft, Priority.ALWAYS);
         HBox.setHgrow(sendPaddingLeft, Priority.ALWAYS);
         HBox wrapperTableController = new HBox(tableTitle, tableControlPaddingLeft, btnDelete, btnAdd),
+                wrapperAttachmentFolder = new HBox(attachmentFolderTitle, attachmentFolderTextField, setAttachmentFolderButton),
                 wrapperEmailSubject = new HBox(mailSubjectTitle, subjectTextField),
                 wrapperSendButton = new HBox(sendPaddingLeft, sendButton);
         wrapperTableController.setId("wrapper");
         wrapperEmailSubject.setId("wrapper");
         wrapperSendButton.setId("wrapper");
+        wrapperAttachmentFolder.setId("wrapper");
         VBox pane = (VBox) super.getPane(),
-                mainBody = new VBox(wrapperTableController, table, wrapperEmailSubject, messageTitle, mailBodyTextArea, wrapperSendButton);
+                mainBody = new VBox(wrapperTableController, table, wrapperAttachmentFolder, wrapperEmailSubject, messageTitle, mailBodyTextArea, wrapperSendButton);
         mainBody.setId("main-body");
         pane.getChildren().addAll(menuBar, mainBody);
         pane.getStylesheets().add("./ui/style.css");
@@ -72,11 +80,10 @@ public class PaneMain extends PaneAbstract {
             String username = ReadFromLog.tbl.get("username"),
                     password = ReadFromLog.tbl.get("password"),
                     serverAddr = ReadFromLog.tbl.get("serverAddr"),
-                    attachmentFolder = "",
-                    subject = subjectTextField.getText(),
-                    bodyMsg = mailBodyTextArea.getText();
+                    attachmentFolder = attachmentFolderTextField.getText().trim(),
+                    subject = subjectTextField.getText().trim(),
+                    bodyMsg = mailBodyTextArea.getText().trim();
             int port = Integer.parseInt(ReadFromLog.tbl.get("port"));
-            System.out.println(serverAddr);
             new SendEmail(username, password, serverAddr, port, attachmentFolder, table.getItems(), subject, bodyMsg).execute();
         });
     }
