@@ -1,4 +1,4 @@
-package bin.command;
+package SendMailSocketUpgradeInterface.bin.command;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;

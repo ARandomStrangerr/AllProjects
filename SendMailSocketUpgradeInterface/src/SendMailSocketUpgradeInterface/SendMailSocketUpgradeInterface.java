@@ -1,7 +1,9 @@
-import bin.command.ReadFromLog;
+package SendMailSocketUpgradeInterface;
+
+import SendMailSocketUpgradeInterface.bin.command.ReadFromLog;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import ui.PaneMain;
+import SendMailSocketUpgradeInterface.ui.PaneMain;
 
 public class SendMailSocketUpgradeInterface extends Application {
     

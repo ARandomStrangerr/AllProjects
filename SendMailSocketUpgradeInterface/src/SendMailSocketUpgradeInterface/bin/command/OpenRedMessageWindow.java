@@ -1,9 +1,9 @@
-package bin.command;
+package SendMailSocketUpgradeInterface.bin.command;
 
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import ui.PaneMessage;
+import SendMailSocketUpgradeInterface.ui.PaneMessage;
 
 public class OpenRedMessageWindow implements Command{
     private final PaneMessage pane;

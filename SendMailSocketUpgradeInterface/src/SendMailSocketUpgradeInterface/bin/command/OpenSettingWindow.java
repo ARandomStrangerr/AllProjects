@@ -1,9 +1,9 @@
-package bin.command;
+package SendMailSocketUpgradeInterface.bin.command;
 
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import ui.PaneSetting;
+import SendMailSocketUpgradeInterface.ui.PaneSetting;
 
 public class OpenSettingWindow implements Command{
     private final Stage ownerWindow;

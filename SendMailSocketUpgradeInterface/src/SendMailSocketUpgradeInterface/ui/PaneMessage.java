@@ -1,4 +1,4 @@
-package ui;
+package SendMailSocketUpgradeInterface.ui;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,7 +17,7 @@ public class PaneMessage extends PaneAbstract {
         buttonWrapper.getStyleClass().add("lower-pane");
         VBox pane = (VBox) super.getPane();
         pane.getChildren().addAll(labelWrapper, buttonWrapper);
-        pane.getStylesheets().add("./ui/style.css");
+        pane.getStylesheets().add("style.css");
         pane.setId(style);
     }
 

@@ -1,8 +1,8 @@
-package ui;
+package SendMailSocketUpgradeInterface.ui;
 
-import bin.command.OpenRedMessageWindow;
-import bin.command.ReadFromLog;
-import bin.command.WriteToLog;
+import SendMailSocketUpgradeInterface.bin.command.OpenRedMessageWindow;
+import SendMailSocketUpgradeInterface.bin.command.ReadFromLog;
+import SendMailSocketUpgradeInterface.bin.command.WriteToLog;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -73,7 +73,7 @@ public class PaneSetting extends PaneAbstract {
         wrapper.getStyleClass().add("lower-pane");
         VBox pane = (VBox) super.getPane();
         pane.getChildren().addAll(upperWrapper,wrapper);
-        pane.getStylesheets().add("./ui/style.css");
+        pane.getStylesheets().add("style.css");
         pane.setId("setting-pane");
     }
 }

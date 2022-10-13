@@ -1,4 +1,4 @@
-package bin.command;
+package SendMailSocketUpgradeInterface.bin.command;
 
 public interface Command {
     boolean execute();

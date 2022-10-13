@@ -1,4 +1,4 @@
-package bin.command;
+package SendMailSocketUpgradeInterface.bin.command;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

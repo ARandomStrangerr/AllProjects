@@ -1,6 +1,5 @@
-package ui;
+package SendMailSocketUpgradeInterface.ui;
 
-import bin.command.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -10,6 +9,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import SendMailSocketUpgradeInterface.bin.command.*;
 
 public class PaneMain extends PaneAbstract {
     public PaneMain(Stage primaryStage) {
@@ -74,7 +74,7 @@ public class PaneMain extends PaneAbstract {
                 mainBody = new VBox(wrapperTableController, table, wrapperAttachmentFolder, wrapperEmailSubject, messageTitle, mailBodyTextArea, wrapperSendButton);
         mainBody.setId("main-body");
         pane.getChildren().addAll(menuBar, mainBody);
-        pane.getStylesheets().add("./ui/style.css");
+        pane.getStylesheets().add("style.css");
         pane.setPrefHeight(600);
         sendButton.setOnAction(event -> {
             String username = ReadFromLog.tbl.get("username"),
@@ -83,8 +83,28 @@ public class PaneMain extends PaneAbstract {
                     attachmentFolder = attachmentFolderTextField.getText().trim(),
                     subject = subjectTextField.getText().trim(),
                     bodyMsg = mailBodyTextArea.getText().trim();
-            int port = Integer.parseInt(ReadFromLog.tbl.get("port"));
-            new SendEmail(username, password, serverAddr, port, attachmentFolder, table.getItems(), subject, bodyMsg).execute();
+            int port;
+            try {
+                port = Integer.parseInt(ReadFromLog.tbl.get("port"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                new OpenRedMessageWindow(super.getStage(), "Cổng máy chủ có định dạng chính xác").execute();
+                return;
+            }
+            if (username.isEmpty()) {
+                new OpenRedMessageWindow(super.getStage(), "Tên đăng nhập chưa được khai báo").execute();
+                return;
+            } else if (password.isEmpty()) {
+                new OpenRedMessageWindow(super.getStage(), "Mật khẩu chưa được khai báo").execute();
+                return;
+            } else if (serverAddr.isEmpty()) {
+                new OpenRedMessageWindow(super.getStage(), "Địa chỉ máy chủ chưa được khai báo").execute();
+                return;
+            } else if (subject.isEmpty()) {
+                new OpenRedMessageWindow(super.getStage(), "Tiêu đề thư chưa được điền").execute();
+                return;
+            }
+            new SendEmail(username, password, serverAddr, port, attachmentFolder, table.getItems(), subject, bodyMsg, super.getStage()).execute();
         });
     }
 }
