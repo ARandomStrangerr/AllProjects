@@ -1,5 +1,6 @@
-package SendMailSocketUpgradeInterface.ui;
+package ui;
 
+import bin.command.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -9,7 +10,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import SendMailSocketUpgradeInterface.bin.command.*;
 
 public class PaneMain extends PaneAbstract {
     public PaneMain(Stage primaryStage) {
@@ -22,8 +22,8 @@ public class PaneMain extends PaneAbstract {
                 setAttachmentFolderButton = new Button("Chọn"),
                 sendButton = new Button("Gửi thư");
         btnDelete.setId("button-red");
-        MenuItem optionAddOne = new MenuItem("add one"),
-                optionAddMany = new MenuItem("add many"),
+        MenuItem optionAddOne = new MenuItem("Thêm một"),
+                optionAddMany = new MenuItem("Thêm từ Excel"),
                 setting = new MenuItem("Cài đặt");
         setting.setOnAction(event -> new OpenSettingWindow(this.getStage()).execute());
         Menu settingMenu = new Menu("Cài đặt");

@@ -1,12 +1,14 @@
-package SendMailSocketUpgradeInterface.bin.command;
+package bin.command;
 
-import SendMailSocketUpgradeInterface.bin.smtp.Office365Server;
+import bin.smtp.Office365Server;
+import ui.PaneBlockMessage;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.stage.Stage;
-import SendMailSocketUpgradeInterface.ui.EmailTableData;
+import ui.EmailTableData;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 
 public class SendEmail implements Command {
     private final String folder, username, password, serverAddress, subject, body;
@@ -36,28 +38,38 @@ public class SendEmail implements Command {
 
     @Override
     public boolean execute() {
+        PaneBlockMessage paneBlockMessage = new PaneBlockMessage(stage);
         new Thread(() -> {
             StringBuilder errorMsg = new StringBuilder();
             Office365Server mailService = new Office365Server(this.serverAddress, this.port, this.username, this.password);
+            int counter = 0;
+            int finalCounter1 = counter;
+            Platform.runLater(() -> {
+                paneBlockMessage.setDisplayLabel(String.format("Hoàn thành gửi đi %d thư", finalCounter1));
+                paneBlockMessage.getStage().show();
+            });
             for (EmailTableData inst : tableData) {
+                counter++;
                 try {
                     mailService.newMsg();
                     mailService.setSender(username);
                     mailService.setReceiver(inst.getEmail());
                     mailService.setSubject(subject);
                     mailService.setBody(body);
-                    if (!inst.getFile().trim().isEmpty())
-                        mailService.setBody(String.format("%s/%s", folder, inst.getFile()));
+                    if (!inst.getFile().trim().isEmpty()) mailService.setAttachment(String.format("%s/%s", folder, inst.getFile()));
                     mailService.send();
-                } catch (MessagingException e) {
+                    int finalCounter = counter;
+                    Platform.runLater(() -> paneBlockMessage.setDisplayLabel(String.format("Hoàn thành gửi đi %d thư", finalCounter)));
+                } catch (MessagingException | IOException e) {
                     e.printStackTrace();
                     if (errorMsg.length() != 0) errorMsg.append("\n");
                     errorMsg.append(e.getMessage());
                 }
             }
-            if (errorMsg.length() != 0) {
-                Platform.runLater(() -> new OpenRedMessageWindow(stage, errorMsg.toString()).execute());
-            }
+            Platform.runLater(() -> {
+                paneBlockMessage.getStage().close();
+                if (errorMsg.length() != 0) new OpenRedMessageWindow(stage, errorMsg.toString()).execute();
+            });
         }).start();
         return true;
     }

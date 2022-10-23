@@ -1,4 +1,4 @@
-package SendMailSocketUpgradeInterface.bin.smtp;
+package bin.smtp;
 
 import javax.mail.*;
 import javax.mail.internet.*;

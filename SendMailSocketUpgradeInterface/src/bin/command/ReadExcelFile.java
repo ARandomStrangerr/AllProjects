@@ -1,10 +1,10 @@
-package SendMailSocketUpgradeInterface.bin.command;
+package bin.command;
 
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
-import SendMailSocketUpgradeInterface.ui.EmailTableData;
+import ui.EmailTableData;
 
 import java.io.File;
 

@@ -1,4 +1,4 @@
-package SendMailSocketUpgradeInterface.ui;
+package ui;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

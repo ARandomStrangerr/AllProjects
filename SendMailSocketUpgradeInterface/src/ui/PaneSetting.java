@@ -1,8 +1,8 @@
-package SendMailSocketUpgradeInterface.ui;
+package ui;
 
-import SendMailSocketUpgradeInterface.bin.command.OpenRedMessageWindow;
-import SendMailSocketUpgradeInterface.bin.command.ReadFromLog;
-import SendMailSocketUpgradeInterface.bin.command.WriteToLog;
+import bin.command.OpenRedMessageWindow;
+import bin.command.ReadFromLog;
+import bin.command.WriteToLog;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;

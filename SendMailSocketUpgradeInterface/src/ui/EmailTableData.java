@@ -1,4 +1,4 @@
-package SendMailSocketUpgradeInterface.ui;
+package ui;
 
 import javafx.beans.property.SimpleStringProperty;
 

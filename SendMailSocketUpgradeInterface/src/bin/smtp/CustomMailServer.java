@@ -1,4 +1,4 @@
-package SendMailSocketUpgradeInterface.bin.smtp;
+package bin.smtp;
 
 import java.io.*;
 import java.net.Socket;
